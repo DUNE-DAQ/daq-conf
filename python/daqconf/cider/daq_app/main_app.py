@@ -1,7 +1,7 @@
 '''
 App for testing configuration 
 '''
-from os import environ, path
+from os import environ
 from  daqconf.cider.app_structures.main_screen import MainScreen
 
 # Textual Imports
@@ -20,7 +20,7 @@ class DbeApp(App):
         self._input_file_name = input_file_name
     
     def on_mount(self):
-        self.push_screen("main")
         
+        self.push_screen("main")
         if self._input_file_name is not None:
-            self.app.get_screen("main").set_input_file(self._input_file_name)
+            self.app.get_screen("main").set_initial_input_file(self._input_file_name)

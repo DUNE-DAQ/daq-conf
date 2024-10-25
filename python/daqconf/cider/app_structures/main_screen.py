@@ -10,7 +10,7 @@ from daqconf.cider.widgets.popups.file_io import SaveWithMessageScreen, OpenFile
 from daqconf.cider.widgets.popups.dropdown_selector import SelectSessionScreen
 from daqconf.cider.app_structures.selection_panel import SelectionPanel
 from daqconf.cider.widgets.popups.quit_screen import QuitScreen
-from os import environ, path
+from os import path
 
 
 class MainScreen(Screen):
@@ -22,35 +22,49 @@ class MainScreen(Screen):
                 Binding("ctrl+s", "save_configuration", "Save Configuration"),
                 Binding("S", "save_configuration_with_message", "Save Configuration with Message"),
                 Binding("o", "open_configuration", "Open Configuration"),
+                Binding("ctrl+q", "request_quit", "Exit Cider"),
+                Binding("ctrl+d", "toggle_disable", "Toggle Disable"),
                 # Binding("a", "add_configuration", "Add Configuration"),
                 # Binding("del", "destroy_configuration", "Destroy Configuration"),
-                Binding("ctrl+d", "toggle_disable", "Toggle Disable"),
-                Binding("q", "request_quit", "Quit"),]
+            ]
     
-    
-    
+    _config_controller = None
+    _init_input = None
+
     def compose(self):
         """Compose main app
         """        
         # Import for app control
-        self._config_controller = ConfigurationController()
+        
+        if self._config_controller is None:
+            self._config_controller = ConfigurationController()
+            
+        
         yield self._config_controller
         yield Footer()
         
-        logger = RichLogWError(id="main_log", highlight=True, markup=True)
-        yield logger
+        self.logger = RichLogWError(id="main_log", highlight=True, markup=True)
+        yield self.logger
         
         # Splash screen
-        logger.write("[red]========================================================================")
-        logger.write("    [bold yellow]Welcome to CIDER![/bold yellow]")
-        logger.write("    [green]This is a work in progress, please use with[/green] [bold red]caution![/bold red]")
-        logger.write("[red]========================================================================\n\n")
+        self.logger.write("[red]========================================================================")
+        self.logger.write("    [bold yellow]Welcome to CIDER![/bold yellow]")
+        self.logger.write("    [green]This is a work in progress, please use with[/green] [bold red]caution![/bold red]")
+        self.logger.write("[red]========================================================================\n\n")
         
+        if self._init_input is not None:
+            self.update_with_new_input(self._init_input)
+        
+    def set_initial_input_file(self, input_file: str):
+        self._init_input = input_file
+
 
     def update_with_new_input(self, input_file_name: str):
         '''
         Update main screen to have a new input file.
         '''
+        self._init_input = input_file_name
+        
         self._config_controller.new_handler_from_str(input_file_name)
 
         # Add interfaces
@@ -75,15 +89,15 @@ class MainScreen(Screen):
         self.refresh()
         
         # Get logger (defined at the start)
-        logger = self.query_one("RichLogWError")
         
         # Get the current database name
         current_database_path = self._config_controller.configuration.databases[0]
         data_base_name = path.basename(current_database_path)
         
         # Print everything!
-        logger.write(f"[bold green]Opened new configuration file: [/bold green][bold red]{data_base_name}[/bold red][bold green].\nConnected databases are:[/bold green]\n" \
+        self.logger.write(f"[bold green]Opened new configuration file: [/bold green][bold red]{data_base_name}[/bold red][bold green].\nConnected databases are:[/bold green]\n" \
                      + "".join([f"   - [red]{db}[/red] \n" for db in self._config_controller.configuration.get_includes()]))
+
 
             
     def on_configuration_controller_changed(self, event):
@@ -119,10 +133,19 @@ class MainScreen(Screen):
         # except:
         self.query_one(RichLogWError).write_error("Could not toggle disable configuration object")
 
+    
+    def call_quit_handler(self):
+        """Call the quit handler just like action_request_quit."""
+        self.app.push_screen(QuitScreen())  # Show the quit confirmation screen
+
     async def action_request_quit(self)->None:
         """Quit TDBE
         """
-        self.app.push_screen(QuitScreen())
+        self.call_quit_handler()
+
+    def handle_sigint(self, signum, frame):
+        # In the event quit is done with ctrl+c
+        self.call_quit_handler()
         
 
     """
