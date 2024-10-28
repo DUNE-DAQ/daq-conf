@@ -4,7 +4,7 @@ import confmodel
 import re
 import socket
 
-def randomize_connectivity_service_port(oksfile, session_name):
+def randomize_connectivity_service_port(oksfile, session_name, specified_port=0):
     """Script to set the value of the Connectivity Service port in the specified Session of the
     specified OKS database file to a random available port number"""
     db = conffwk.Configuration("oksconflibs:" + oksfile)
@@ -23,15 +23,18 @@ def randomize_connectivity_service_port(oksfile, session_name):
     ]
     dal = conffwk.dal.module("dal", schemafiles)
 
-    def find_free_port():
-        with socket.socket() as s:
-            s.bind(("", 0))
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            port = s.getsockname()[1]
-            s.close()
-            return port
+    if specified_port == 0:
+        def find_free_port():
+            with socket.socket() as s:
+                s.bind(("", 0))
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                port = s.getsockname()[1]
+                s.close()
+                return port
 
-    new_port = find_free_port()
+        new_port = find_free_port()
+    else:
+        new_port = specified_port
 
     session.connectivity_service.service.port = new_port
     db.update_dal(session.connectivity_service.service)
@@ -42,7 +45,7 @@ def randomize_connectivity_service_port(oksfile, session_name):
             for clparam in app.commandline_parameters:
                 if "gunicorn" in clparam:
                     pattern = re.compile('(.*0\.0\.0\.0)\:\d+(.*)')
-                    app.commandline_parameters[index] = pattern.sub(f'\\1\:{new_port}\\2',clparam)
+                    app.commandline_parameters[index] = pattern.sub(f'\\1:{new_port}\\2', clparam)
                     #print(f"{app}")
                     db.update_dal(app)
                     break
