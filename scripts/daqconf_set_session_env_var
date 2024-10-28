@@ -1,10 +1,5 @@
 #!/bin/env python3
-import conffwk
-import confmodel
-
 import click
-import os
-import glob
 from daqconf.set_session_env_var import set_session_env_var
 
 @click.command()
