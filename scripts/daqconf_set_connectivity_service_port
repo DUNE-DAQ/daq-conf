@@ -1,0 +1,15 @@
+#!/bin/env python3
+import click
+from daqconf.set_connectivity_service_port import set_connectivity_service_port
+
+@click.command()
+@click.argument('oks_session_name')
+@click.argument('oksfile')
+@click.argument('connsvc_port', required=False, default=0)
+def daqconf_set_connectivity_service_port(oksfile, oks_session_name, connsvc_port):
+  """Script to set the value of the Connectivity Service port in the specified Session of the specified
+  OKS database file. If the new port is not specified, it is set to a random available port number."""
+  set_connectivity_service_port(oksfile, oks_session_name, connsvc_port)
+
+if __name__ == '__main__':
+  daqconf_set_connectivity_service_port()

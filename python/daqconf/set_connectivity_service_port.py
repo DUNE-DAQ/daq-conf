@@ -4,9 +4,9 @@ import confmodel
 import re
 import socket
 
-def randomize_connectivity_service_port(oksfile, session_name, specified_port=0):
-    """Script to set the value of the Connectivity Service port in the specified Session of the
-    specified OKS database file to a random available port number"""
+def set_connectivity_service_port(oksfile, session_name, connsvc_port=0):
+    """Script to set the value of the Connectivity Service port in the specified Session of the specified
+    OKS database file. If the new port is not specified, it is set to a random available port number."""
     db = conffwk.Configuration("oksconflibs:" + oksfile)
     if session_name == "":
         print(f"Error: the session name needs to be specified")
@@ -23,7 +23,7 @@ def randomize_connectivity_service_port(oksfile, session_name, specified_port=0)
     ]
     dal = conffwk.dal.module("dal", schemafiles)
 
-    if specified_port == 0:
+    if connsvc_port == 0:
         def find_free_port():
             with socket.socket() as s:
                 s.bind(("", 0))
@@ -34,7 +34,7 @@ def randomize_connectivity_service_port(oksfile, session_name, specified_port=0)
 
         new_port = find_free_port()
     else:
-        new_port = specified_port
+        new_port = connsvc_port
 
     session.connectivity_service.service.port = new_port
     db.update_dal(session.connectivity_service.service)
