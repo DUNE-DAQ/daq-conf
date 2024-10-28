@@ -10,13 +10,13 @@ def randomize_connectivity_service_port(oksfile, session_name, specified_port=0)
     db = conffwk.Configuration("oksconflibs:" + oksfile)
     if session_name == "":
         print(f"Error: the session name needs to be specified")
-        return
+        return 0
     else:
         try:
             session = db.get_dal("Session", session_name)
         except:
             print(f"Error could not find Session {session_name} in file {oksfile}")
-            return
+            return 0
 
     schemafiles = [
         "schema/confmodel/dunedaq.schema.xml"
@@ -52,3 +52,4 @@ def randomize_connectivity_service_port(oksfile, session_name, specified_port=0)
                 index += 1
 
     db.commit()
+    return new_port
