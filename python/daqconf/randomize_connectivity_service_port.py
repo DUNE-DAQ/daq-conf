@@ -33,22 +33,16 @@ def randomize_connectivity_service_port(oksfile, session_name):
 
     new_port = find_free_port()
 
-    #print(f"Connectivity service is {session.connectivity_service}")
-    #print(f"Connectivity service is {session.connectivity_service.service}")
-    #print(f"Connectivity service port is {session.connectivity_service.service.port}")
     session.connectivity_service.service.port = new_port
     db.update_dal(session.connectivity_service.service)
 
     for app in session.infrastructure_applications:
-        #print(f"{app}")
         if app.className() == "ConnectionService":
             index = 0
             for clparam in app.commandline_parameters:
                 if "gunicorn" in clparam:
-                    pattern = re.compile('(.*0\.0\.0\.0\:)\d+(.*)')
-                    blah = pattern.sub('\\1PORT\\2', clparam)
-                    blah2 = blah.replace("PORT", f"{new_port}")
-                    app.commandline_parameters[index] = blah2
+                    pattern = re.compile('(.*0\.0\.0\.0)\:\d+(.*)')
+                    app.commandline_parameters[index] = pattern.sub(f'\\1\:{new_port}\\2',clparam)
                     #print(f"{app}")
                     db.update_dal(app)
                     break
