@@ -5,6 +5,7 @@ from rich.tree import Tree
 from rich.table import Table
 
 import click
+import itertools
 
 import conffwk
 from daqconf.session import get_segment_apps
@@ -20,6 +21,20 @@ def start_ipython(loc):
         IPython.embed(colors="neutral")
     except ImportError:
         print(f"[red]IPython not available[/red]")
+
+
+def to_int_ranges(int_list):
+    """
+    Group a list of integers into ranges
+    """
+    groups = (list(x) for _, x in
+          itertools.groupby(sorted(int_list), lambda x, c=itertools.count(): x - next(c)))
+    return [(e[0], e[-1]) for e in groups]
+
+def ranges_to_str( int_ranges ):
+    return ', '.join(
+        f'{r[0]}-{r[1]}' if r[0] != r[1] else f'{r[0]}' for r in int_ranges
+    )
 
 
 def enabled_to_emoji(enabled: Union[int, None]) -> str:
@@ -522,33 +537,69 @@ def show_object_tree(obj, uid, show_attrs, focus_path, level):
     print(tree)
 
         
-# @cli.command()
-# @click.argument('uid', type=click.UNPROCESSED, callback=verify_oks_uid, default=None)
-# @click.pass_obj
-# def test_find_relations(obj, uid):
-
-#     cfg = obj.cfg
-#     id, klass = uid
+@cli.command(short_help="Show detector-daq connections")
+@click.pass_obj
+def show_d2d_connections(obj):
 
 
-#     if klass not in cfg.classes():
-#         print(f'[red]Class {klass} unknow to configuration[/red]')
-#         print(f'Known classes: {sorted(cfg.classes())}')
-#         raise SystemExit(-1)
+    from rich.highlighter import ReprHighlighter
+    rh = ReprHighlighter()
+    cfg = obj.cfg
 
-#     try:
-#         dal_obj = cfg.get_dal(klass, id)
-#     except RuntimeError as e:
-#         raise click.BadArgumentUsage(f"Object '{id}' does not exist")
-    
-#     print(dal_obj)
-    
-#     grp = set()
-#     find_related_dals(dal_obj, grp)
 
-#     print(f"Found {len(grp)} objects related to {id}@{klass}")
-#     # print(grp)
-#     IPython.embed(colors="neutral")
+    d2d = cfg.get_dals('DetectorToDaqConnection')
+
+    t = Table("connection", "receiver", "type",  "# senders", "send types", "source ids", "det ids", "crate ids", "slot ids", "stream ids")
+    for conn in d2d:
+
+        if len(conn.contains) != 2:
+            raise RuntimeError(f"Too many objects found in {conn.id} : {len(conn.contains)}(expected 1 senger group and 1 receiver)")
+
+        recs = [ r for r in conn.contains if 'DetDataReceiver' in r.oksTypes()]
+        send_grps = [ r for r in conn.contains if 'ResourceSetAND' in r.oksTypes()]
+
+        if len(recs) != 1:
+            raise RuntimeError(f"Multiple receivers found in connection {conn.id}")
+
+        if len(send_grps) != 1:
+            raise RuntimeError(f"Multiple sender groups found in connection {conn.id}")
+        
+
+        rcvr = recs[0]
+        sndr_grp = send_grps[0]
+        sndrs = [ r for r in sndr_grp.contains if 'DetDataSender' in r.oksTypes()]
+        if len(sndr_grp.contains) != len(sndrs):
+            raise RuntimeError(f"Not all sender in {conn.id} are DetDataSenders")
+        
+        strm_id_list = []
+        det_ids = set()
+        crate_ids = set()
+        slot_ids = set()
+        stream_ids = set()
+        sndr_types = set()
+        for sndr in sndrs:
+            sndr_types.add(sndr.className())
+            for strm in sndr.contains:
+                strm_id_list.append(strm.source_id)
+                det_ids.add(strm.geo_id.detector_id)
+                crate_ids.add(strm.geo_id.crate_id)
+                slot_ids.add(strm.geo_id.slot_id)
+                stream_ids.add(strm.geo_id.stream_id)
+
+        t.add_row(
+            rh(conn.id), 
+            rh(rcvr.id), 
+            rh(f"'{rcvr.className()}'"),
+            rh(str(len(sndrs))), 
+            rh(str(', '.join([f"'{s}'" for s in sndr_types]))), 
+            rh(ranges_to_str(to_int_ranges(strm_id_list))), 
+            rh(ranges_to_str(to_int_ranges(det_ids))), 
+            rh(ranges_to_str(to_int_ranges(crate_ids))), 
+            rh(ranges_to_str(to_int_ranges(slot_ids))),
+            rh(ranges_to_str(to_int_ranges(stream_ids))),
+            )
+
+    print(t)
 
 
 @cli.command(short_help="Verify detector streams in the database")
