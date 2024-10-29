@@ -29,6 +29,7 @@ def set_connectivity_service_port(oksfile, session_name, connsvc_port=0):
                 s.bind(("", 0))
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 port = s.getsockname()[1]
+                s.shutdown()
                 s.close()
                 return port
 
@@ -36,15 +37,16 @@ def set_connectivity_service_port(oksfile, session_name, connsvc_port=0):
     else:
         new_port = connsvc_port
 
-    session.connectivity_service.service.port = new_port
-    db.update_dal(session.connectivity_service.service)
+    if session.connectivity_service is not None:
+        session.connectivity_service.service.port = new_port
+        db.update_dal(session.connectivity_service.service)
 
     for app in session.infrastructure_applications:
         if app.className() == "ConnectionService":
             index = 0
             for clparam in app.commandline_parameters:
                 if "gunicorn" in clparam:
-                    pattern = re.compile('(.*0\.0\.0\.0)\:\d+(.*)')
+                    pattern = re.compile(r'(.*0\.0\.0\.0)\:\d+(.*)')
                     app.commandline_parameters[index] = pattern.sub(f'\\1:{new_port}\\2', clparam)
                     #print(f"{app}")
                     db.update_dal(app)
