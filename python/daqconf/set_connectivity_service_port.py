@@ -29,7 +29,6 @@ def set_connectivity_service_port(oksfile, session_name, connsvc_port=0):
                 s.bind(("", 0))
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 port = s.getsockname()[1]
-                s.shutdown()
                 s.close()
                 return port
 
