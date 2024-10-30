@@ -208,7 +208,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.option('-i', '--interactive', is_flag=True, show_default=True, default=False, help="Start an interactive IPython session after executing the commands")
-@click.argument('config_file')
+@click.argument('config_file', type=click.Path(exists=True))
 @click.pass_obj
 def cli(obj, interactive, config_file):
     """
