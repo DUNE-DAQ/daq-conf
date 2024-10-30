@@ -65,9 +65,12 @@ class RelationalSelectionMenu(SelectionInterface):
         relations_list = []
         for rel_category in relationships:
             for rel_type, rel in rel_category.items():
+                # TODO: Better data structure, need class info for now
+                if rel_type=='rel_info':
+                    continue
                 # Bit slower but configuration isn't large enough for this to really matter]
                 relations_list.append({f"[blue]{rel_type}[/blue]": [self.__build_node(r) for r in rel]})
-            
+
         
         return {conf_obj: relations_list}
     

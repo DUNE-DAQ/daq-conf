@@ -226,3 +226,67 @@ class ConfigurationController(Static):
             """Notify if/when configuration is changed"""
             super().__init__()
             self.dal = dal
+            
+    def modify_current_dal_relationship(self, relationship_name: str, updated_value, append: bool=False):
+        # Wrapper method for changing value of relationship to anythings
+        self.__no_handler_error()
+        self.handler.configuration_handler.modify_relationship(self._current_selected_object.className(),
+                                          getattr(self._current_selected_object, 'id'),
+                                          relationship_name, updated_value, append)
+        
+    def remove_current_dal_relationship(self, relationship_name):
+        # Wrapper method for setting relationship value to None
+        self.__no_handler_error()
+        self.handler.configuration_handler.modify_relationship(self._current_selected_object.className(),
+                                          getattr(self._current_selected_object, 'id'),
+                                          relationship_name, 
+                                          None)
+
+    def pop_dal_relationship(self, relationship_name, dal_to_remove):
+        # Wrapper method for removing dal from multi-value relationship
+        self.__no_handler_error()
+        
+        if dal_to_remove is None:
+            raise Exception("Relationship is already emptied")
+        
+        relationship_dict = self.get_relation_category_in_current_dal(relationship_name)
+                
+        relationships = relationship_dict[relationship_name]
+        
+        if not relationship_dict['rel_info']['multivalue']:
+            self.remove_current_dal_relationship(relationship_name)
+            return
+        
+        # Grab index of dal to be removed
+        try:
+            dal_idx = relationships.index(dal_to_remove)
+        except:
+            raise Exception(relationships)
+        
+        relationships.pop(dal_idx)
+        
+        
+        setattr(self._current_selected_object, relationship_name, relationships)
+
+        
+    # Some wrapper methods to avoid needing to call the base handler object
+    def get_dals_of_class(self, dal_class: str):
+        return self._handler.configuration_handler.get_conf_objects_class(dal_class)
+    
+    
+    def get_relations_to_current_dal(self):
+        return self._handler.configuration_handler.get_relationships_for_conf_object(self.current_dal)
+    
+    # Maybe move to handler...
+    def get_relation_category_in_current_dal(self, relation_name: str):
+        relations = self.get_relations_to_current_dal()
+        
+        # Find the correct category
+        for rel in relations:
+            if list(rel.keys())[0] != relation_name:
+                continue
+            
+            # Found correct_relation
+            return rel
+        
+        raise RuntimeError(f"Error cannot find relation: {relation_name} in {self.generate_rich_string(self._current_selected_object)}")

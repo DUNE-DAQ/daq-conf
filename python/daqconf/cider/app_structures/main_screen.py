@@ -10,6 +10,7 @@ from daqconf.cider.widgets.popups.file_io import SaveWithMessageScreen, OpenFile
 from daqconf.cider.widgets.popups.dropdown_selector import SelectSessionScreen
 from daqconf.cider.app_structures.selection_panel import SelectionPanel
 from daqconf.cider.widgets.popups.quit_screen import QuitScreen
+from daqconf.cider.widgets.popups.config_object_modifier_screen import ConfigObjectModifierScreen
 from os import path
 
 
@@ -23,6 +24,7 @@ class MainScreen(Screen):
                 Binding("S", "save_configuration_with_message", "Save Configuration with Message"),
                 Binding("o", "open_configuration", "Open Configuration"),
                 Binding("ctrl+q", "request_quit", "Exit Cider"),
+                Binding("ctrl+r", "modify_relations", "Modify Relations"),
                 Binding("ctrl+d", "toggle_disable", "Toggle Disable"),
                 # Binding("a", "add_configuration", "Add Configuration"),
                 # Binding("del", "destroy_configuration", "Destroy Configuration"),
@@ -147,6 +149,8 @@ class MainScreen(Screen):
         # In the event quit is done with ctrl+c
         self.call_quit_handler()
         
+    async def action_modify_relations(self)->None:
+        self.app.push_screen(ConfigObjectModifierScreen())        
 
     """
     Currently adding/destroying configuration objects is not well implemented and is disabled

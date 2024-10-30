@@ -1,17 +1,19 @@
-"""
-NOT COMPLETE!
-"""
+# PLEASE DONT LET THIS BE COMMITED IN THE FINAL VERSION USING IT FOR PSEUDO-PYTHON PLANNING
 
-from pathlib import Path
-from typing import Iterable
-
-from textual.screen import ModalScreen
-from textual.widgets import DirectoryTree
-
-class DatabaseDirectoryTree(DirectoryTree):
-    def filter_paths(self, paths: Iterable[Path])->Iterable[Path]:
-        return [path for  path in paths if not path.name.endswith(".data.xml")]
+class RelationModifier:
+    def select_object(self):
+        pass
     
-class DirectoryTreeScreen(ModalScreen):
-    def compose(self):
-        yield DatabaseDirectoryTree("./")
+    def delete_object(self):
+        pass
+    
+    def add_new_object(self):
+        pass
+    
+    def swap_object(self):
+        self.delete_object()
+        self.add_new_object()
+        
+
+class Selection:
+    
