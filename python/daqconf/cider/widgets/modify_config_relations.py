@@ -64,7 +64,10 @@ class SingleRelationshipModifier(Static):
     def button_pressed(self, event: Button.Pressed)->None:
         if event.button.id=="delete_rel":
             # Pop dal [if it's empty will just delete]
-            self._config_controller.pop_dal_relationship(self._relationship_name, self._current_related_dal)
+            try:            
+                self._config_controller.pop_dal_relationship(self._relationship_name, self._current_related_dal)
+            except:
+                self._logger.write("[bold blue]Info:[/bold blue] [blue]Removing duplicate")
             self.remove()
             
 
@@ -148,6 +151,9 @@ class RelationshipSelectPanel(Static):
         
     def verify_relations(self):
         for r in self._relation_groups:
-            r.verify_unique_dals()
+            try:
+                r.verify_unique_dals()
+            except Exception as e:
+                self._logger.write(e)
 
 

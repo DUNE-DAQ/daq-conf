@@ -33,6 +33,10 @@ class ConfigObjectModifierScreen(ModalScreen):
             rel_panel.verify_relations()
             # except Exception as e:
             #     self._logger.write_error(e)
-
+            main_screen = self.app.get_screen("main")
+            selection_menu = main_screen.query_exactly_one("SelectionPanel")
+            selection_menu.refresh(recompose=True)
+            selection_menu.restore_menu_state()
             self.app.screen.dismiss()
 
+            # Refresh the main screen

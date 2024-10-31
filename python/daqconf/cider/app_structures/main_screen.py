@@ -150,7 +150,8 @@ class MainScreen(Screen):
         self.call_quit_handler()
         
     async def action_modify_relations(self)->None:
-        self.app.push_screen(ConfigObjectModifierScreen())        
+        self.app.push_screen(ConfigObjectModifierScreen())     
+
 
     """
     Currently adding/destroying configuration objects is not well implemented and is disabled
