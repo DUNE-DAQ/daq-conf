@@ -1,6 +1,9 @@
 import conffwk
 
 def get_segment_apps(segment):
+    """
+    Gather the list of applications in the segment and its sub-segments
+    """
     apps = []
 
     for ss in segment.segments:
@@ -15,7 +18,9 @@ def get_segment_apps(segment):
 
 
 def get_session_apps(confdb, session_name=""):
-    """Get the apps defined in the given session"""
+    """
+    Gather the apps defined used in a session.
+    """
     if session_name == "":
         session_dals = confdb.get_dals(class_name="Session")
         if len(session_dals) == 0:
@@ -35,6 +40,9 @@ def get_session_apps(confdb, session_name=""):
 
 
 def get_apps_in_any_session(confdb):
+    """
+    Gather the applications used in any session present in the database
+    """
 
     output = {}
     session_dals = confdb.get_dals(class_name="Session")

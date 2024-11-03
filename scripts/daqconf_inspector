@@ -569,6 +569,7 @@ def show_d2d_connections(obj):
         sndr_grp = send_grps[0]
         sndrs = [ r for r in sndr_grp.contains if 'DetDataSender' in r.oksTypes()]
         if len(sndr_grp.contains) != len(sndrs):
+            print(sndr_grp.contains)
             raise RuntimeError(f"Not all sender in {conn.id} are DetDataSenders")
         
         strm_id_list = []
