@@ -36,7 +36,10 @@ class DeleteConfigObjectScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "delete":
-            self._config_controller.destroy_current_object()
+            try:
+                self._config_controller.destroy_current_object()
+            except Exception as e:
+                self._main_screen.query_one("RichLogWError").write_error(e)
             self.dismiss_and_update()
         else:
             self.app.pop_screen()

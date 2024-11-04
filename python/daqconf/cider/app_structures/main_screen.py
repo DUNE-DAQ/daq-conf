@@ -60,10 +60,7 @@ class MainScreen(Screen):
         await self.mount(Footer())
         
         if self._init_input is not None:
-            try:
-                self.update_with_new_input(self._init_input)
-            except Exception as e:
-                self.logger.write_error(e)
+            self.update_with_new_input(self._init_input)
 
     def set_initial_input_file(self, input_file: str):
         self._init_input = input_file
@@ -173,5 +170,3 @@ class MainScreen(Screen):
     async def action_rename_configuration(self)->None:
         self.app.push_screen(RenameConfigObjectScreen())
         
-    async def action_clean_configuration(self)->None:
-        self.app.push_screen(CleanConfigScreen())

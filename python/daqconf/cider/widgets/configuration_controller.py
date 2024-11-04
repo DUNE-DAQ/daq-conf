@@ -14,7 +14,7 @@ class ConfigurationController(Static):
     """Controller widget for the full configuration. In principal this is 
     where all communication with the configuration is actually done!
     """
-    # BINDINGS = [("ctrl+s", "save_configuration", "Save Configuration")]
+    BINDINGS = [("ctrl+s", "save_configuration", "Save Configuration")]
 
     _handler: StructuredConfiguration | None = None
     _selection_interfaces: Dict[str, SelectionInterface] = {}
