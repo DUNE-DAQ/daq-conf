@@ -28,11 +28,11 @@ class MainScreen(Screen):
                 Binding("ctrl+s", "save_configuration_with_message", "Save Configuration"),
                 Binding("ctrl+o", "open_configuration", "Open Configuration"),
                 Binding("ctrl+q", "request_quit", "Exit Cider"),
-                Binding("ctrl+m", "modify_relations", "Modify Relations"),
-                Binding("ctrl+r", "rename_configuration", "Rename"),
+                Binding("ctrl+m", "modify_relations", "Modify Relation to Object"),
+                Binding("ctrl+r", "rename_configuration", "Rename Conf Object"),
                 Binding("d", "toggle_disable", "Toggle Disable"),
                 Binding("ctrl+a", "add_configuration", "Add Conf Object"),
-                Binding("ctrl+d", "destroy_configuration", "Destroy Configuration"),
+                Binding("ctrl+d", "destroy_configuration", "Delete Conf Object"),
             ]
     
     _config_controller = None
@@ -60,8 +60,10 @@ class MainScreen(Screen):
         await self.mount(Footer())
         
         if self._init_input is not None:
-            self.update_with_new_input(self._init_input)
-
+            try:
+                self.update_with_new_input(self._init_input)
+            except Exception as e:
+                self.logger.write_error(e)
 
     def set_initial_input_file(self, input_file: str):
         self._init_input = input_file
@@ -105,8 +107,6 @@ class MainScreen(Screen):
         # Print everything!
         self.logger.write(f"[bold green]Opened new configuration file: [/bold green][bold red]{data_base_name}[/bold red][bold green].\nConnected databases are:[/bold green]\n" \
                      + "".join([f"   - [red]{db}[/red] \n" for db in self._config_controller.configuration.get_includes()]))
-
-
             
     def on_configuration_controller_changed(self, event):
         """Updates table based on global state of the configuration controller
