@@ -156,6 +156,10 @@ class ConfigurationController(Static):
         self._handler.configuration_handler.destroy_conf_obj(class_id, uid)
         self._logger.write(f"[green]Destroyed configuration object[/green] [red]{class_id}[/red]@[yellow]{uid}[/yellow]")
 
+    def destroy_current_object(self):
+        if self.current_dal is not None:
+            self.destroy_conf_obj(self.current_dal.className(), getattr(self.current_dal, 'id'))
+        # self.current_dal = None
 
     def can_be_disabled(self)->bool:
         """Check if current object is capable of being disabled
@@ -267,12 +271,13 @@ class ConfigurationController(Static):
         
         
         setattr(self._current_selected_object, relationship_name, relationships)
-
         
     # Some wrapper methods to avoid needing to call the base handler object
     def get_dals_of_class(self, dal_class: str):
         return self._handler.configuration_handler.get_conf_objects_class(dal_class)
     
+    def get_list_of_classes(self):
+        return list(self._handler.configuration_handler.get_all_conf_classes().keys())
     
     def get_relations_to_current_dal(self):
         return self._handler.configuration_handler.get_relationships_for_conf_object(self.current_dal)

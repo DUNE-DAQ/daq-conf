@@ -4,6 +4,7 @@ from textual.containers import Grid
 from textual.app import ComposeResult
 from os import environ
 
+
 class QuitScreen(Screen):
     """Screen with a dialog to quit."""
     css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"

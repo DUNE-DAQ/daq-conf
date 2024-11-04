@@ -1,22 +1,18 @@
-SaveWithMessageScreen{
-    align: center middle;
-
-}
-
-OpenFileScreen{
+AddNewObjectScreen{
     width: 50%;
-    align: center middle;
-    content-align: center middle;
     background: grey 10%;
+    align: center middle;
 }
 
-__MenuWithButtons{
+AddNewObject{
     width: 80%;
     content-align-horizontal: center;
 }
 
-
-#save_box{
+#object_add_box{
+    grid-size: 4 ;
+    grid-gutter: 1 2;
+    grid-rows: 1fr 3;
     padding: 0 1;
     width: 100%;
     height: 11;
@@ -26,18 +22,21 @@ __MenuWithButtons{
     background: $surface;
 }
 
+Input{
+    column-span: 2;
+    width: 50%;
+}
+
+Select{
+    column-span: 2;
+    width: 50%;
+}
+
 Button{
+    column-span: 1;
     width: auto;
 }
 
-.save_message {
-    text-style: bold;
-    height: auto;
-    content-align: center top;
-}
 .buttons {
-    height: auto;
     width: 100%;
-    content-align: center bottom;
-    dock: bottom;
 }

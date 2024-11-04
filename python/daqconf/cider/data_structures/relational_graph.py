@@ -118,6 +118,10 @@ class RelationalGraph:
     
     @property
     def top_level_nodes(self):
+        # Means we automatically rebuild the graph
+        if len(self._max_distance!=len(self._handler.conf_obj_list)):
+            self.generate_graph()
+        
         return [dal for i, dal in enumerate(self._handler.conf_obj_list) if self._max_distance[i]==0]
     
     

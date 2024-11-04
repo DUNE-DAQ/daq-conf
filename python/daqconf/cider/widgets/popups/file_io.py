@@ -10,7 +10,7 @@ from textual.containers import Horizontal, Container
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
 
 class __MenuWithButtons(Static):
-    def __init__(self, button_labels: Dict[str, str], name: str | None=None, id: str | None = None, classes: str | None = None) -> None:
+    def __init__(self, button_labels: Dict[str, str], input_message: str="", name: str | None=None, id: str | None = None, classes: str | None = None) -> None:
         super().__init__(name=name, id=id, classes=classes)
         """Base class for popups with N buttons and a single input field
         """        
@@ -18,18 +18,19 @@ class __MenuWithButtons(Static):
         self._button_labels = button_labels
         self._main_screen = self.app.get_screen("main")
         self._config_controller = self._main_screen.query_one(ConfigurationController)
+        self._input_message = input_message
 
     def compose(self):
         """Generates interfaxce
         """
         with Container(id="save_box"):
+            yield Input(placeholder=self._input_message, classes="save_message")
             with Horizontal(classes="buttons"):
                 # Add buttons
                 for button_id, button_text in self._button_labels.items():
                     yield Button(button_text, id=button_id)
                 yield Button("Cancel", id="cancel")
             # Add input field
-            yield Input(placeholder="Message goes here", classes="save_message")
         
     def button_actions(self, button_id: str| None):
         raise NotImplementedError("button_actions should be implemented in the child class")
@@ -49,7 +50,7 @@ class __MenuWithButtons(Static):
         # Cancel button does this too but no need to check!
         self.app.screen.dismiss(result="yay")
         
-
+####### File Saving ##########
 
 class SaveWithMessage(__MenuWithButtons):
     def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
@@ -60,17 +61,19 @@ class SaveWithMessage(__MenuWithButtons):
             "save" : "Save"
         }
         
-        super().__init__(self._button_labels, name, id, classes)
+        super().__init__(self._button_labels, "Enter update message", name, id, classes)
 
     def input_action(self, message: str):
         self._config_controller.commit_configuration(message)
     
     def button_actions(self, button_id: str):
         match button_id:
-             case "save":
+            case "save":
                 input = self.query_one(Input)
                 self.input_action(input.value)
-                 
+            case _:
+                return         
+        
 class SaveWithMessageScreen(ModalScreen[bool]):
     css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
     
@@ -86,6 +89,8 @@ class SaveWithMessageScreen(ModalScreen[bool]):
         message_box = self.query_one(SaveWithMessage)
         message_box.focus()
         
+        
+####### File Opening ##########
 class OpenFile(__MenuWithButtons):
     def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
         
@@ -97,7 +102,7 @@ class OpenFile(__MenuWithButtons):
         Concrete class for opening a configuration file
         """
         
-        super().__init__(self._button_labels, name, id, classes)
+        super().__init__(self._button_labels, "Enter file path", name, id, classes)
 
 
     def input_action(self, new_config: str):
@@ -106,9 +111,9 @@ class OpenFile(__MenuWithButtons):
         """
         try:
             self._main_screen.update_with_new_input(new_config)        
-        except:
+        except Exception as e:
             logger = self._main_screen.query_one("RichLogWError")
-            logger.write_error(f"[red]Could open: {new_config}")
+            logger.write_error(e)
     
     def button_actions(self, button_id: str | None):
         """Open file or browse for file (not implemented)
@@ -127,6 +132,8 @@ class OpenFile(__MenuWithButtons):
             case "browse":
                 logger = self._main_screen.query_one("RichLogWError")
                 logger.write_error("Sorry not done this yet, please enter full file path and hit enter/open!")
+            case _:
+                return
 
 
 class OpenFileScreen(Screen):
@@ -152,3 +159,47 @@ class OpenFileScreen(Screen):
         message_box.focus()
         
         
+
+######## Rename Object ###########
+class RenameConfigObject(__MenuWithButtons):
+    def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
+        
+        self._button_labels = {
+            "rename" : "Rename",
+        }
+        """
+        Concrete class for opening a configuration file
+        """
+        
+        super().__init__(self._button_labels, "", name, id, classes)
+
+        # Bit hacky but "shrug"
+        self._input_message = getattr(self._config_controller.current_dal, "id")
+
+        
+    def input_action(self, new_file_name: str):
+        """
+        Add new handler based on config name
+        """
+        try:
+            self._config_controller.rename_dal(new_file_name)      
+        except Exception as e:
+            logger = self._main_screen.query_one("RichLogWError")
+            logger.write_error(e)
+    
+    def button_actions(self, button_id: str | None):
+        """Open file or browse for file (not implemented)
+
+        Arguments:
+            button_id -- Button label
+        """        
+        match button_id:
+            case "rename":
+                input = self.query_one(Input)
+                
+                # Safety check to avoid empty input
+                if input:                
+                    self.input_action(input.value)
+
+            case _:
+                return

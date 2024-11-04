@@ -3,7 +3,7 @@ NOT COMPLETE!
 """
 
 from textual import on
-from textual.widgets import Select, Button, Static, Pretty
+from textual.widgets import Select, Button, Static, Label
 from textual.widgets import Button
 from textual.containers import Grid, Container, VerticalScroll
 from rich.console import RichCast, ConsoleRenderable
@@ -93,13 +93,13 @@ class RelationshipTypeGroup(Static):
         
         self._dropdown_list = [SingleRelationshipModifier(self._rinfo["type"], r, self._relationship_name) for r in rel_list]
          
-        yield Pretty(self._relationship_name)
+        yield Label(self._relationship_name)
         for s in self._dropdown_list:
             yield s
 
         # logic for button being disabled
         add_deactivated = (not self._rinfo['multivalue'] \
-                            and len(self._dropdown_list)==1 \
+                            and len(self._dropdown_list)>1 \
                             or len(self._dropdown_list)==len(self._config_controller.get_dals_of_class(self._rinfo['type'])))
             
 

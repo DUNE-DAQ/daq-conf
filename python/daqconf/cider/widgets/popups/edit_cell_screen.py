@@ -1,12 +1,19 @@
+from os import environ
+
 from textual.screen import ModalScreen
 from textual.app import ComposeResult
-from textual.widgets import Input
+from textual.widgets import Input, Label
+from textual.containers import Container
 
 from typing import Any
 
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
 
 class EditCellScreen(ModalScreen):
+    css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
+    
+    CSS_PATH = f"{css_file_path}/edit_cell_layout.tcss"
+  
     def __init__(
         self, event: Any, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
         super().__init__(name=name, id=id, classes=classes)
@@ -25,7 +32,9 @@ class EditCellScreen(ModalScreen):
         self._controller = main_screen.query_one(ConfigurationController)
 
     def compose(self) -> ComposeResult:
-        yield Input()
+        with Container(id="edit_cell"):
+            yield Label(f"Enter new value for {self._current_row[0]}")
+            yield Input()
 
     def on_mount(self) -> None:
         """Finds the cell that was clicked and populates the input field

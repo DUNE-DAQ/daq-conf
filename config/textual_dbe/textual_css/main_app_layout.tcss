@@ -18,7 +18,10 @@ SelectionPanel {
 }
 
 RichLogWError{
-    align-vertical: bottom;
+    align-vertical: top;
+    width: 100%;
+    height: 30%; 
+
 }
 
 ConfigTable{

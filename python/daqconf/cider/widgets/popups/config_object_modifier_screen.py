@@ -2,6 +2,7 @@
 from daqconf.cider.widgets.modify_config_relations import RelationshipSelectPanel
 from daqconf.cider.widgets.config_table import ConfigTable
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
+from daqconf.cider.widgets.popups.file_io import RenameConfigObject
 
 from textual.containers import Grid
 from textual.screen import ModalScreen
@@ -21,7 +22,9 @@ class ConfigObjectModifierScreen(ModalScreen):
         # self._logger = main_screen.query_one("main_log")
 
         # ConfigTable(id="sub_config_table"),
+        # yield RenameConfigObject(id="rename")
         yield RelationshipSelectPanel(id="rel_select")
+        
         yield Button("Exit", variant="success", id="exit")
         
     def on_button_pressed(self, event: Button.Pressed)->None:
