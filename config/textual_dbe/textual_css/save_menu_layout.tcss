@@ -39,6 +39,7 @@ Button{
 .save_message {
     text-style: bold;
     height: auto;
+    width: 100%;
     content-align: center top;
 }
 .buttons {
