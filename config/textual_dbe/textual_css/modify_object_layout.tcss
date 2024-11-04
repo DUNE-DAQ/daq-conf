@@ -6,6 +6,7 @@ SingleRelationshipModifier{
     grid-size: 3;
     grid-gutter: 1 2;
     grid-rows: 1fr 3;
+    background: grey 10%;
 }
 
 Select{

@@ -1,5 +1,11 @@
 SaveWithMessageScreen{
     align: center middle;
+    background: grey 10%;
+}
+
+RenameConfigObjectScreen{
+    align: center middle;
+    background: grey 10%;
 
 }
 

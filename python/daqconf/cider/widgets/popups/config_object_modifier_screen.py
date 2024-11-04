@@ -16,15 +16,7 @@ class ConfigObjectModifierScreen(ModalScreen):
     CSS_PATH = f"{css_file_path}/modify_object_layout.tcss"
 
     def compose(self):
-
-        # main_screen = self.app.get_screen("main")
-        # self._config_controller = main_screen.query_one(ConfigurationController)
-        # self._logger = main_screen.query_one("main_log")
-
-        # ConfigTable(id="sub_config_table"),
-        # yield RenameConfigObject(id="rename")
-        yield RelationshipSelectPanel(id="rel_select")
-        
+        yield RelationshipSelectPanel(id="rel_select")        
         yield Button("Exit", variant="success", id="exit")
         
     def on_button_pressed(self, event: Button.Pressed)->None:

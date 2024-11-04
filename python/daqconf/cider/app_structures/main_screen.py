@@ -13,6 +13,8 @@ from daqconf.cider.widgets.popups.quit_screen import QuitScreen
 from daqconf.cider.widgets.popups.config_object_modifier_screen import ConfigObjectModifierScreen
 from daqconf.cider.widgets.popups.add_objects import AddNewObjectScreen
 from daqconf.cider.widgets.popups.delete_object_screen import DeleteConfigObjectScreen
+from daqconf.cider.widgets.popups.file_io import RenameConfigObjectScreen
+
 from os import path
 
 
@@ -22,19 +24,19 @@ class MainScreen(Screen):
     
     # Key binds
     BINDINGS = [
-                Binding("ctrl+s", "save_configuration", "Save Configuration"),
-                Binding("S", "save_configuration_with_message", "Save Configuration with Message"),
-                Binding("o", "open_configuration", "Open Configuration"),
+                # Binding("ctrl+s", "save_configuration", "Save Configuration"),
+                Binding("ctrl+s", "save_configuration_with_message", "Save Configuration"),
+                Binding("ctrl+o", "open_configuration", "Open Configuration"),
                 Binding("ctrl+q", "request_quit", "Exit Cider"),
-                Binding("ctrl+r", "modify_relations", "Modify Relations"),
-                Binding("ctrl+d", "toggle_disable", "Toggle Disable"),
+                Binding("ctrl+m", "modify_relations", "Modify Relations"),
+                Binding("ctrl+r", "rename_configuration", "Rename"),
+                Binding("d", "toggle_disable", "Toggle Disable"),
                 Binding("ctrl+a", "add_configuration", "Add Conf Object"),
-                Binding("D", "destroy_configuration", "Destroy Configuration"),
+                Binding("ctrl+d", "destroy_configuration", "Destroy Configuration"),
             ]
     
     _config_controller = None
     _init_input = None
-
     
     def __make_logger(self, splash: bool=False):
         self.logger = RichLogWError(id="main_log", highlight=True, markup=True)
@@ -161,11 +163,15 @@ class MainScreen(Screen):
             self.app.push_screen(AddNewObjectScreen())
         except Exception as e:
             self.query_one(RichLogWError).write_error(e)
-  
     
     async def action_destroy_configuration(self)->None:
         try:
             self.app.push_screen(DeleteConfigObjectScreen())
         except Exception as e:
             self.query_one(RichLogWError).write_error(e)
-  
+    
+    async def action_rename_configuration(self)->None:
+        self.app.push_screen(RenameConfigObjectScreen())
+        
+    async def action_clean_configuration(self)->None:
+        self.app.push_screen(CleanConfigScreen())

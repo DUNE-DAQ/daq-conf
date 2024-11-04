@@ -10,7 +10,7 @@ from textual.containers import Horizontal, Container
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
 
 class __MenuWithButtons(Static):
-    def __init__(self, button_labels: Dict[str, str], input_message: str="", name: str | None=None, id: str | None = None, classes: str | None = None) -> None:
+    def __init__(self, button_labels: Dict[str, Dict[str, str]], input_message: str="", name: str | None=None, id: str | None = None, classes: str | None = None) -> None:
         super().__init__(name=name, id=id, classes=classes)
         """Base class for popups with N buttons and a single input field
         """        
@@ -27,9 +27,9 @@ class __MenuWithButtons(Static):
             yield Input(placeholder=self._input_message, classes="save_message")
             with Horizontal(classes="buttons"):
                 # Add buttons
-                for button_id, button_text in self._button_labels.items():
-                    yield Button(button_text, id=button_id)
-                yield Button("Cancel", id="cancel")
+                for button_text, button_properties in self._button_labels.items():
+                    yield Button(button_properties["label"], id=button_text, variant=button_properties["variant"])
+                yield Button("Cancel", id="cancel", variant="error")
             # Add input field
         
     def button_actions(self, button_id: str| None):
@@ -58,7 +58,7 @@ class SaveWithMessage(__MenuWithButtons):
         Concrete class for saving configuration with a message
         """
         self._button_labels = {
-            "save" : "Save"
+            "save" : {"label": "Save", "variant": "success"}
         }
         
         super().__init__(self._button_labels, "Enter update message", name, id, classes)
@@ -95,8 +95,8 @@ class OpenFile(__MenuWithButtons):
     def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
         
         self._button_labels = {
-            "open" : "Open",
-            "browse" : "Browse"
+            "open" : {"label": "Open", "variant": "success"},
+            "browse" : {"label": "Browse [DOESN'T WORK]", "variant": "warning"}
         }
         """
         Concrete class for opening a configuration file
@@ -165,7 +165,7 @@ class RenameConfigObject(__MenuWithButtons):
     def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
         
         self._button_labels = {
-            "rename" : "Rename",
+            "rename" : {"label": "Rename", "variant": "success"}
         }
         """
         Concrete class for opening a configuration file
@@ -182,7 +182,12 @@ class RenameConfigObject(__MenuWithButtons):
         Add new handler based on config name
         """
         try:
-            self._config_controller.rename_dal(new_file_name)      
+            self._config_controller.rename_dal(new_file_name) 
+            main_screen = self.app.get_screen("main")
+            selection_menu = main_screen.query_exactly_one("SelectionPanel")
+            selection_menu.refresh(recompose=True)
+            selection_menu.restore_menu_state()
+
         except Exception as e:
             logger = self._main_screen.query_one("RichLogWError")
             logger.write_error(e)
@@ -203,3 +208,18 @@ class RenameConfigObject(__MenuWithButtons):
 
             case _:
                 return
+
+class RenameConfigObjectScreen(Screen):
+    css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
+    
+    CSS_PATH = f"{css_file_path}/save_menu_layout.tcss"
+    """
+    Splash screen for saving to file
+    """
+                    
+    def compose(self)->ComposeResult:     
+        yield RenameConfigObject()
+    
+    def on_mount(self) -> None:
+        message_box = self.query_one(RenameConfigObject)
+        message_box.focus()

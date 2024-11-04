@@ -5,12 +5,11 @@ NOT COMPLETE!
 from textual import on
 from textual.widgets import Select, Button, Static, Label
 from textual.widgets import Button
-from textual.containers import Grid, Container, VerticalScroll
+from textual.containers import VerticalScroll
 from rich.console import RichCast, ConsoleRenderable
 
 from typing import Any
 
-from daqconf.cider.widgets.config_table import ConfigTable
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
 from daqconf.cider.widgets.custom_rich_log import RichLogWError
 

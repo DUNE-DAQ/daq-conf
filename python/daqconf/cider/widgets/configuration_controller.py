@@ -14,7 +14,7 @@ class ConfigurationController(Static):
     """Controller widget for the full configuration. In principal this is 
     where all communication with the configuration is actually done!
     """
-    BINDINGS = [("ctrl+s", "save_configuration", "Save Configuration")]
+    # BINDINGS = [("ctrl+s", "save_configuration", "Save Configuration")]
 
     _handler: StructuredConfiguration | None = None
     _selection_interfaces: Dict[str, SelectionInterface] = {}
@@ -142,7 +142,8 @@ class ConfigurationController(Static):
     def rename_dal(self, new_name: str)->None:
         """Rename the currently selected object [NOT TESTED]
         """        
-        self._current_selected_object.rename_object(new_name)
+        self._current_selected_object.rename(new_name)
+        self._handler.configuration_handler.configuration.update_dal(self._current_selected_object)    
 
     def add_new_conf_obj(self, class_id: str, uid: str):
         """Add new object to configuration
