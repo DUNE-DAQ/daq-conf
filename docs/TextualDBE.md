@@ -1,6 +1,6 @@
-# Textual Database Editor (DBE)
+# CIDER
 ## Introduction
-Textual DBE is an attempt to replicate [DBE](https://github.com/DUNE-DAQ/dbe/tree/develop) within a fully Pythonic interface. The tool allows for browsing and modification of configurations with a text-based (but mouse-navigable) interface written in Python. **This is not intended to be a full production ready solution and is purely a proof of concept!**
+CIDER (Configuration Interface for Database Editing and Relational viewing) is an attempt to replicate [DBE](https://github.com/DUNE-DAQ/dbe/tree/develop) within a fully Pythonic interface. The tool allows for browsing and modification of configurations with a text-based (but mouse-navigable) interface written in Python. **This is not intended to be a full production ready solution and is purely a proof of concept!**
 
 ## Usage
 Open database editor with `textual_dbe [-f/--input-file input/file/path] `. This will open a splash screen displaying a blank logger + footer bar which contains a list of shortcuts. If input file is provided it will instead sip straight to the file file loaded screen.
@@ -27,7 +27,7 @@ The second "relationship" view will display the relationships between configurat
 If an object in the navigator menu is selected it will be treated as `active` and its attributes will be displayed in the configuration object attribute table.
 
 #### Disabling objects
-Any objects that inherit from `component` can be disabled by selecting them + pressing `ctrl+d`.
+Any objects that inherit from `component` can be disabled by selecting them + pressing d`.
 
 ### Configuration Object Attribute Table
 The configuration table displays the values of attributes of the currently active configuration object. The values for these attributes can be modified by clicking on the row of the table which contains them. Type checking is very limited so this should be treated with caution
@@ -35,18 +35,16 @@ The configuration table displays the values of attributes of the currently activ
 
 After an object has been modified, it can then be saved by pressing `ctrl+s` or saved with an additional message with `shift+S`.
 
+### Modifying Relationships between config objects
+By pressing ctrl+m a series of dropdown menus will appear. These allow for relationships to the selected configuration object be added/removed. 
+
+### Adding New Configuration Objects
+Pressing `ctrl+a` allows for a new config object to be added. This requires both the class and uid to be set. Note: This will break if you don't correctly setup required relationships and attributes!
+
+### Deleting an object
+Pressing ctrl+d will delete the currently selected object. NOTE: There is no undo button so be careful!
+
 ### Logger
 Logger simply displays warnings/updates. Not everything is fully logged and there are no verbosity levels.
 ![image](textual_dbe/logger.png)
 
-## Known Issues
-- Currently relationships for given configuration objects cannot be modified 
-- Type checking is not robust at all for editing attributes
-- All newly created objects are currently just saved to the active database
-- No way to create new databases
-- Relationship view simply displays objects rather than also displaying the name of the relationship
-
-## To Do List
-- [x] Add method to disable components
-- [ ] Add more robust method for adding/modifying/deleting config objects
-- [x] Display name of relationship in relationship view
