@@ -351,13 +351,13 @@ def generate_readout(
   the readoutmap (config/np04readoutmap.data.xml) and write the
   generated apps to readoutApps.data.xml.
 
-     generate_readoutOKS --session --segment \
+     generate_readoutOKS --system --segment \
        -i appmodel/fsm -i hosts \
        -i appmodel/connections.data.xml -i appmodel/moduleconfs  \
-       config/np04readoutmap.data.xml np04readout-session.data.xml
+       config/np04readoutmap.data.xml np04readout-system.data.xml
 
    Will do the same but in addition it will generate a containing
-  Segment for the apps and a containing Session for the Segment.
+  Segment for the apps and a containing System for the Segment.
 
   NB: Currently FSM generation is not implemented so you must include
   an fsm file in order to generate a Segment
@@ -1011,15 +1011,15 @@ def generate_trigger(
     return
 
 
-def generate_session(
+def generate_system(
     oksfile,
     include,
-    session_name,
+    system_name,
     op_env,
     connectivity_service_is_infrastructure_app=True,
     disable_connectivity_service=False,
 ):
-    """Simple script to create an OKS configuration file for a session.
+    """Simple script to create an OKS configuration file for a system.
 
       The file will automatically include the relevant schema files and
     any other OKS files you specify.
@@ -1086,7 +1086,7 @@ def generate_session(
     TRACE_FILE = os.getenv("TRACE_FILE")
     if TRACE_FILE is not None:
         trace_file_var = dal.Variable(
-            "session-env-trace-file", name="TRACE_FILE", value=TRACE_FILE
+            "system-env-trace-file", name="TRACE_FILE", value=TRACE_FILE
         )
         db.update_dal(trace_file_var)
 
@@ -1103,8 +1103,8 @@ def generate_session(
     if trace_file_var is not None:
         env_vars_for_local_running.append(trace_file_var)
 
-    sessiondal = dal.Session(
-        session_name,
+    systemdal = dal.System(
+        system_name,
         environment=env_vars_for_local_running,
         segment=seg,
         detector_configuration=detconf,
@@ -1116,9 +1116,9 @@ def generate_session(
         conn_svc_cfg = db.get_dal(
             class_name="ConnectivityService", uid="local-connectivity-service-config"
         )
-        sessiondal.connectivity_service = conn_svc_cfg
+        systemdal.connectivity_service = conn_svc_cfg
 
-    db.update_dal(sessiondal)
+    db.update_dal(systemdal)
 
     db.commit()
     return

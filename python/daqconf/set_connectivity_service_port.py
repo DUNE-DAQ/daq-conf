@@ -4,18 +4,18 @@ import confmodel
 import re
 import socket
 
-def set_connectivity_service_port(oksfile, session_name, connsvc_port=0):
-    """Script to set the value of the Connectivity Service port in the specified Session of the specified
+def set_connectivity_service_port(oksfile, system_name, connsvc_port=0):
+    """Script to set the value of the Connectivity Service port in the specified System of the specified
     OKS database file. If the new port is not specified, it is set to a random available port number."""
     db = conffwk.Configuration("oksconflibs:" + oksfile)
-    if session_name == "":
-        print(f"Error: the session name needs to be specified")
+    if system_name == "":
+        print(f"Error: the system name needs to be specified")
         return 0
     else:
         try:
-            session = db.get_dal("Session", session_name)
+            system = db.get_dal("System", system_name)
         except:
-            print(f"Error could not find Session {session_name} in file {oksfile}")
+            print(f"Error could not find System {system_name} in file {oksfile}")
             return 0
 
     schemafiles = [
@@ -36,11 +36,11 @@ def set_connectivity_service_port(oksfile, session_name, connsvc_port=0):
     else:
         new_port = connsvc_port
 
-    if session.connectivity_service is not None:
-        session.connectivity_service.service.port = new_port
-        db.update_dal(session.connectivity_service.service)
+    if system.connectivity_service is not None:
+        system.connectivity_service.service.port = new_port
+        db.update_dal(system.connectivity_service.service)
 
-    for app in session.infrastructure_applications:
+    for app in system.infrastructure_applications:
         if app.className() == "ConnectionService":
             index = 0
             for clparam in app.commandline_parameters:
