@@ -23,7 +23,7 @@ class SelectionMenu(Static):
         if self._tree is not None:
             self._tree.clear()
     
-        self._tree = Tree(f"File Browser:")
+        self._tree = Tree(f"Configuration:")
         main_screen = self.app.get_screen("main")
         self._controller = main_screen.query_one("ConfigurationController")
 

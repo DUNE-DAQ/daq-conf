@@ -112,8 +112,7 @@ class ConfigurationHandler:
     
     @configuration.setter
     def configuration(self)->None:
-        """Dunder method in case I try to do something silly
-
+        """dummy method in case I try to do something silly
         """
         raise NotImplementedError(f"Configuration object is not mutable, please create new object")
     

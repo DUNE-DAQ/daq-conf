@@ -28,7 +28,7 @@ class MainScreen(Screen):
                 Binding("ctrl+s", "save_configuration_with_message", "Save Configuration"),
                 Binding("ctrl+o", "open_configuration", "Open Configuration"),
                 Binding("ctrl+q", "request_quit", "Exit Cider"),
-                Binding("ctrl+m", "modify_relations", "Modify Relation to Object"),
+                Binding("ctrl+e", "modify_relations", "Modify Relation to Object"),
                 Binding("ctrl+r", "rename_configuration", "Rename Conf Object"),
                 Binding("d", "toggle_disable", "Toggle Disable"),
                 Binding("ctrl+a", "add_configuration", "Add Conf Object"),
