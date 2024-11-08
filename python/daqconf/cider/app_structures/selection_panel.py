@@ -11,8 +11,8 @@ class SelectionPanel(Static):
     
     _current_menu = None
     _saved_states = None
-    _menu_ids = {"Sort By Class" : "class-selection",
-                    "Sort By Relationship" : "relation-selection"}
+    _menu_ids = {"Class View" : "class-selection",
+                    "Session View" : "relation-selection"}
     
     def compose(self) -> ComposeResult:
         """Compose the selection panel for use in the app
