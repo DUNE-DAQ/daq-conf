@@ -18,7 +18,7 @@ Commandline utility to generate a graphical flow diagram of a full configuration
   Add Resource objects to or remove from the `disabled` relationship of a Session
 
 ### `consolidate`
-  Merge the contents of several database files, putting all objects into a single output file. Output file will only include schemas.
+  Merge the contents of several database files, putting all objects into a single output file. Output file will NOT include schemas.
 
 ### `consolidate_files`
   Merge the contents of several database files, preserving included databases. Output file will contain only objects defined in files given on command line.
