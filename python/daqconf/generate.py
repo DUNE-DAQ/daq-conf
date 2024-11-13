@@ -64,12 +64,14 @@ def generate_dataflow(
     trigger_record_q_rule = db.get_dal(
         class_name="QueueConnectionRule", uid="trigger-record-q-rule"
     )
-    dfapp_qrules = [trigger_record_q_rule]
+    td_q_rule = db.get_dal(class_name="QueueConnectionRule", uid="trb-td-queue-rule")
+    token_q_rule = db.get_dal(class_name="QueueConnectionRule", uid="token-queue-rule")
+    dfapp_qrules = [trigger_record_q_rule, token_q_rule, td_q_rule]
 
     # Net Rules
     frag_net_rule = db.get_dal(class_name="NetworkConnectionRule", uid="frag-net-rule")
-    df_token_net_rule = db.get_dal(
-        class_name="NetworkConnectionRule", uid="df-token-net-rule"
+    df_hb_net_rule = db.get_dal(
+        class_name="NetworkConnectionRule", uid="df-hb-net-rule"
     )
     tpset_net_rule = db.get_dal(
         class_name="NetworkConnectionRule", uid="tpset-net-rule"
@@ -78,8 +80,8 @@ def generate_dataflow(
     td_dfo_net_rule = db.get_dal(
         class_name="NetworkConnectionRule", uid="td-dfo-net-rule"
     )
-    td_trb_net_rule = db.get_dal(
-        class_name="NetworkConnectionRule", uid="td-trb-net-rule"
+    dfod_net_rule = db.get_dal(
+        class_name="NetworkConnectionRule", uid="dfo-decision-net-rule"
     )
     data_req_trig_net_rule = db.get_dal(
         class_name="NetworkConnectionRule", uid="data-req-trig-net-rule"
@@ -91,14 +93,14 @@ def generate_dataflow(
         class_name="NetworkConnectionRule", uid="data-req-readout-net-rule"
     )
     dfapp_netrules = [
-        td_trb_net_rule,
+        dfod_net_rule,
         frag_net_rule,
-        df_token_net_rule,
+        df_hb_net_rule,
         data_req_hsi_net_rule,
         data_req_readout_net_rule,
         data_req_trig_net_rule,
     ]
-    dfo_netrules = [td_dfo_net_rule, ti_net_rule, df_token_net_rule]
+    dfo_netrules = [td_dfo_net_rule, ti_net_rule, df_hb_net_rule]
     tpw_netrules = [tpset_net_rule]
 
     opmon_conf = db.get_dal(class_name="OpMonConf", uid="slow-all-monitoring")
@@ -118,6 +120,10 @@ def generate_dataflow(
     trb_conf = db.get_dal(class_name="TRBConf", uid="trb-01")
     dw_conf = db.get_dal(class_name="DataWriterConf", uid="dw-01")
     dfhw = db.get_dal(class_name="DFHWConf", uid="dfhw-01")
+
+    dfobroker = dal.DFOBrokerConf("dfobroker-01", initial_active_dfo=dfo)
+    db.update_dal(dfobroker)
+
     dfapps = []
     for dfapp_idx in range(n_dfapps):
         dfapp_id = dfapp_idx + 1
@@ -146,6 +152,7 @@ def generate_dataflow(
             opmon_conf=opmon_conf,
             trb=trb_conf,
             data_writers=[dw_conf] * n_data_writers,
+            broker = dfobroker,
             uses=dfhw,
         )
         db.update_dal(dfapp)
