@@ -259,8 +259,7 @@ namespace daqconf {
 
         if (match) {
 
-          incoming_matched.push_back(incoming.first);
-          outgoing_matched.push_back(outgoing.first);
+	  bool low_level_plot = m_root_object_kind == ObjectKind::kApplication || m_root_object_kind == ObjectKind::kModule;
 
           for (auto& receiver : incoming.second) {
             for (auto& sender : outgoing.second) {
@@ -275,7 +274,24 @@ namespace daqconf {
                 continue;
               } else if (m_objects_for_graph.at(sender).kind != m_objects_for_graph.at(receiver).kind) {
                 continue;
-              }
+              } else if (low_level_plot && incoming.first.find("NetworkConnection") != std::string::npos) {
+
+		// Don't want to directly link modules in an
+		// application if the data is transferred over network
+		continue;
+	      }
+
+	      if (!low_level_plot || incoming.first.find(".*") == std::string::npos) {
+		if (std::ranges::find(incoming_matched, incoming.first) == incoming_matched.end()) {
+		  incoming_matched.push_back(incoming.first);
+		}
+	      }
+
+	      if (!low_level_plot || outgoing.first.find(".*") == std::string::npos) {
+		if (std::ranges::find(outgoing_matched, outgoing.first) == outgoing_matched.end()) {
+		  outgoing_matched.push_back(outgoing.first);
+		}
+	      }
 
               const EnhancedObject::ReceivingInfo receiving_info {incoming.first, receiver};
 

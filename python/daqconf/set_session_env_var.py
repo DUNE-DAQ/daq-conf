@@ -1,10 +1,6 @@
 import conffwk
 import confmodel
 
-import os
-import glob
-
-
 def set_session_env_var(oksfile, env_var_name, env_var_value, session_name):
     """Script to set the value of an environment variable in the specified Session of the
     specified OKS database file"""
