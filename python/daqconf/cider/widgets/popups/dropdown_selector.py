@@ -42,8 +42,8 @@ class SelectSession(Static):
         
 
 class SelectSessionScreen(ModalScreen):
-    # css_file_path = f"{environ.get('DBT_AREA_ROOT')}/sourcecode/daqconf/python/daqconf/textual_dbe/textual_css"
-    # CSS_PATH = f"{css_file_path}/session_selection_layout.tcss"
+    css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
+    CSS_PATH = f"{css_file_path}/session_selection_layout.tcss"
 
     def compose(self):
         yield SelectSession()
