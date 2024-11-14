@@ -5,4 +5,3 @@ from textual.widgets import RichLog
 class RichLogWError(RichLog):
     def write_error(self, exception: Exception):
         super().write(f"ERROR: [red]{str(exception)}")
-    

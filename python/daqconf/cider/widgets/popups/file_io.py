@@ -1,19 +1,16 @@
 
 from typing import Dict
-from os import path, environ
+from os import environ
 
 from textual.screen import ModalScreen, Screen
 from textual.app import ComposeResult
 from textual.widgets import Input, Button, Static
 from textual.containers import Horizontal, Container
 
-from daqconf.textual_dbe.widgets.configuration_controller import ConfigurationController
-from daqconf.textual_dbe.widgets.config_table import ConfigTable
-from daqconf.textual_dbe.app_structures.selection_panel import SelectionPanel
-from daqconf.textual_dbe.widgets.popups.directory_tree import DatabaseDirectoryTree
+from daqconf.cider.widgets.configuration_controller import ConfigurationController
 
 class __MenuWithButtons(Static):
-    def __init__(self, button_labels: Dict[str, str], name: str | None=None, id: str | None = None, classes: str | None = None) -> None:
+    def __init__(self, button_labels: Dict[str, Dict[str, str]], input_message: str="", name: str | None=None, id: str | None = None, classes: str | None = None) -> None:
         super().__init__(name=name, id=id, classes=classes)
         """Base class for popups with N buttons and a single input field
         """        
@@ -21,18 +18,19 @@ class __MenuWithButtons(Static):
         self._button_labels = button_labels
         self._main_screen = self.app.get_screen("main")
         self._config_controller = self._main_screen.query_one(ConfigurationController)
+        self._input_message = input_message
 
     def compose(self):
         """Generates interfaxce
         """
         with Container(id="save_box"):
+            yield Input(placeholder=self._input_message, classes="save_message")
             with Horizontal(classes="buttons"):
                 # Add buttons
-                for button_id, button_text in self._button_labels.items():
-                    yield Button(button_text, id=button_id)
-                yield Button("Cancel", id="cancel")
+                for button_text, button_properties in self._button_labels.items():
+                    yield Button(button_properties["label"], id=button_text, variant=button_properties["variant"])
+                yield Button("Cancel", id="cancel", variant="error")
             # Add input field
-            yield Input(placeholder="Message goes here", classes="save_message")
         
     def button_actions(self, button_id: str| None):
         raise NotImplementedError("button_actions should be implemented in the child class")
@@ -52,7 +50,7 @@ class __MenuWithButtons(Static):
         # Cancel button does this too but no need to check!
         self.app.screen.dismiss(result="yay")
         
-
+####### File Saving ##########
 
 class SaveWithMessage(__MenuWithButtons):
     def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
@@ -60,20 +58,22 @@ class SaveWithMessage(__MenuWithButtons):
         Concrete class for saving configuration with a message
         """
         self._button_labels = {
-            "save" : "Save"
+            "save" : {"label": "Save", "variant": "success"}
         }
         
-        super().__init__(self._button_labels, name, id, classes)
+        super().__init__(self._button_labels, "Enter update message", name, id, classes)
 
     def input_action(self, message: str):
         self._config_controller.commit_configuration(message)
     
     def button_actions(self, button_id: str):
         match button_id:
-             case "save":
+            case "save":
                 input = self.query_one(Input)
                 self.input_action(input.value)
-                 
+            case _:
+                return         
+        
 class SaveWithMessageScreen(ModalScreen[bool]):
     css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
     
@@ -89,30 +89,31 @@ class SaveWithMessageScreen(ModalScreen[bool]):
         message_box = self.query_one(SaveWithMessage)
         message_box.focus()
         
+        
+####### File Opening ##########
 class OpenFile(__MenuWithButtons):
     def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
         
         self._button_labels = {
-            "open" : "Open",
-            "browse" : "Browse"
+            "open" : {"label": "Open", "variant": "success"},
+            "browse" : {"label": "Browse [DOESN'T WORK]", "variant": "warning"}
         }
         """
         Concrete class for opening a configuration file
         """
         
-        super().__init__(self._button_labels, name, id, classes)
+        super().__init__(self._button_labels, "Enter file path", name, id, classes)
 
 
     def input_action(self, new_config: str):
         """
         Add new handler based on config name
         """
-        self._config_controller.new_handler_from_str(new_config)
         try:
-            self.update_main_screen()
-        except:
+            self._main_screen.update_with_new_input(new_config)        
+        except Exception as e:
             logger = self._main_screen.query_one("RichLogWError")
-            logger.write_error(f"[red]Could open: {new_config}")
+            logger.write_error(e)
     
     def button_actions(self, button_id: str | None):
         """Open file or browse for file (not implemented)
@@ -131,45 +132,9 @@ class OpenFile(__MenuWithButtons):
             case "browse":
                 logger = self._main_screen.query_one("RichLogWError")
                 logger.write_error("Sorry not done this yet, please enter full file path and hit enter/open!")
+            case _:
+                return
 
-        
-
-    def update_main_screen(self):
-        """Updates the main screen with the new configuration. Fully refreshes the screen + objects [is slowish]
-        """        
-        
-        # Add interfaces
-        self._config_controller.add_interface("class-selection")
-        self._config_controller.add_interface("relation-selection")
-
-        # Mount the selection panel
-        try:
-            self._main_screen.mount(SelectionPanel())
-        except:
-            raise Exception("Selection panel not found, something's gone wrong")
-
-        # Mount config table
-        try:
-            config_table = self._main_screen.query_one(ConfigTable)
-            config_table.update_table(self._config_controller.current_dal)
-        except:
-            config_table = ConfigTable(id="main_table")
-            self._main_screen.mount(config_table)
-
-        # Refresh the screen for safety
-        self._main_screen.refresh()
-        
-        # Get logger (defined at the start)
-        logger = self._main_screen.query_one("RichLogWError")
-        
-        # Get the current database name
-        current_database_path = self._config_controller.configuration.databases[0]
-        data_base_name = path.basename(current_database_path)
-        
-        # Print everything!
-        logger.write(f"[bold green]Opened new configuration file: [/bold green][bold red]{data_base_name}[/bold red][bold green].\nConnected databases are:[/bold green]\n" \
-                     + "".join([f"   - [red]{db}[/red] \n" for db in self._config_controller.configuration.get_includes()]))
-        
 
 class OpenFileScreen(Screen):
     
@@ -194,3 +159,67 @@ class OpenFileScreen(Screen):
         message_box.focus()
         
         
+
+######## Rename Object ###########
+class RenameConfigObject(__MenuWithButtons):
+    def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
+        
+        self._button_labels = {
+            "rename" : {"label": "Rename", "variant": "success"}
+        }
+        """
+        Concrete class for opening a configuration file
+        """
+        
+        super().__init__(self._button_labels, "", name, id, classes)
+
+        # Bit hacky but "shrug"
+        self._input_message = getattr(self._config_controller.current_dal, "id")
+
+        
+    def input_action(self, new_file_name: str):
+        """
+        Add new handler based on config name
+        """
+        try:
+            self._config_controller.rename_dal(new_file_name) 
+            main_screen = self.app.get_screen("main")
+            selection_menu = main_screen.query_exactly_one("SelectionPanel")
+            selection_menu.refresh(recompose=True)
+            selection_menu.restore_menu_state()
+
+        except Exception as e:
+            logger = self._main_screen.query_one("RichLogWError")
+            logger.write_error(e)
+    
+    def button_actions(self, button_id: str | None):
+        """Open file or browse for file (not implemented)
+
+        Arguments:
+            button_id -- Button label
+        """        
+        match button_id:
+            case "rename":
+                input = self.query_one(Input)
+                
+                # Safety check to avoid empty input
+                if input:                
+                    self.input_action(input.value)
+
+            case _:
+                return
+
+class RenameConfigObjectScreen(Screen):
+    css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
+    
+    CSS_PATH = f"{css_file_path}/save_menu_layout.tcss"
+    """
+    Splash screen for saving to file
+    """
+                    
+    def compose(self)->ComposeResult:     
+        yield RenameConfigObject()
+    
+    def on_mount(self) -> None:
+        message_box = self.query_one(RenameConfigObject)
+        message_box.focus()

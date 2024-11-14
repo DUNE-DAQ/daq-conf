@@ -1,13 +1,9 @@
-"""
-NOT COMPLETE!
-"""
-
 from textual import on
 from textual.screen import Screen
 from textual.widgets import Input, Select, Button, Static
 
-from daqconf.textual_dbe.widgets.config_table import ConfigTable
-from daqconf.textual_dbe.widgets.configuration_controller import ConfigurationController
+from daqconf.cider.widgets.config_table import ConfigTable
+from daqconf.cider.widgets.configuration_controller import ConfigurationController
 
 """
 Collection of objects that define the configuration object
@@ -26,7 +22,7 @@ class ConfigObjectSelectionPanel(Static):
             raise Exception("Configuration handler not found")
 
         yield Input(placeholder="Enter new object name", id="new_object_name")
-        yield Select.from_values(list(self._controller.handler.get_all_conf_classes().keys()), id="new_object_class")
+        yield Select.from_values(list(self._controller.handler.configuration_handler.get_all_conf_classes().keys()), id="new_object_class")
         yield Button("Select", id="select_object")
 
     @on(Select.Changed)

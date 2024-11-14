@@ -50,20 +50,20 @@ class ConfigurationHandler:
             conf_object -- Any DAL object
 
         Returns:
-            _description_
+            List of related objects
         """        
         relations =  self.get_related_classes(conf_object.className())
 
         relations_list = []
         
         # Loop over relations                
-        for rel in relations.keys():
+        for rel, rel_info in relations.items():
             rel_val = getattr(conf_object, rel)
             # Hacky but pybind got fussy about casting list(dal)
             if not isinstance(rel_val, list):
                 rel_val = [rel_val]
-            
-            relations_list.append({rel: [v for v in rel_val if v is not None]})
+
+            relations_list.append({rel: [v for v in rel_val if v is not None], 'rel_info': rel_info})
 
         return relations_list
     
@@ -112,8 +112,7 @@ class ConfigurationHandler:
     
     @configuration.setter
     def configuration(self)->None:
-        """Dunder method in case I try to do something silly
-
+        """dummy method in case I try to do something silly
         """
         raise NotImplementedError(f"Configuration object is not mutable, please create new object")
     
@@ -173,4 +172,51 @@ class ConfigurationHandler:
         self.configuration.destroy_dal(dal)
         self._loaded_dals.remove(dal)
         
+    def modify_relationship(self, class_id, uid, relationship_name: str, updated_value,
+                            append: bool=False):
+        """Modify TODO: EDIT THIS
+
+        :param class_id: _description_
+        :type class_id: _type_
+        :param uid: _description_
+        :type uid: _type_
+        :param relationship_name: _description_
+        :type relationship_name: str
+        :param updated_value: _description_
+        :type updated_value: _type_
+        :param append: _description_, defaults to False
+        :type append: bool, optional
+        """
+        # Firstly we need to find the relationship this is referring to
+        selected_dal = self.configuration.get_dal(class_id, uid)
+        # Okay need a better way of doing this...
+        rel_list = self.get_relationships_for_conf_object(selected_dal)
         
+        for relations in rel_list:
+            # Need to find our dal
+            if list(relations.keys())[0] != relationship_name:
+                continue
+            
+            # Next we need to check the type of our object is okay
+            if updated_value not in self.get_conf_objects_class(relations['rel_info']['type']):
+                raise Exception(updated_value)
+                # raise TypeError(f"Cannot use object {updated_value} for relation expecting type {relations['rel_info']['type']}")
+            
+            # Need to make sure everything is typed correctly
+            if append and relations['rel_info']['multivalue']:
+                rel = list(relations.items)[0]
+                rel.append(updated_value)
+            
+            elif relations['rel_info']['multivalue']:
+                rel = [updated_value]
+            else:
+                rel = updated_value
+
+            # Should update the dal 
+            setattr(selected_dal, relationship_name, rel)
+            self.configuration.update_dal(selected_dal)
+            
+            
+            return
+        
+        raise RuntimeError(f"Cannot find relationship with name {relationship_name}")

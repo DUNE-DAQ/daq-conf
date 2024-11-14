@@ -1,0 +1,24 @@
+EditCellScreen{
+    align: center middle;
+    width: 50%;
+    background: grey 10%;
+    content-align: center middle;
+}
+
+#edit_cell{
+    padding: 0 1;
+    width: 60;
+    height: 11;
+    border: thick $background 80%;
+    background: $surface;
+    align: center middle;
+}
+
+Label{
+    width: 100%;
+    content-align: center middle;
+}
+
+Input{
+    width: 100%;
+}

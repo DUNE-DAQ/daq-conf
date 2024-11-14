@@ -1,20 +1,35 @@
 SaveWithMessageScreen{
-    width: 50%;
     align: center middle;
+    background: grey 10%;
+}
+
+RenameConfigObjectScreen{
+    align: center middle;
+    background: grey 10%;
+
 }
 
 OpenFileScreen{
     width: 50%;
     align: center middle;
+    content-align: center middle;
+    background: grey 10%;
 }
 
+__MenuWithButtons{
+    width: 80%;
+    content-align-horizontal: center;
+}
+
+
 #save_box{
-    background: $panel;
-    border: tall $background;
-    height: auto;
     padding: 0 1;
     width: 100%;
-    content-align: center middle
+    height: 11;
+    border: thick $background 80%;
+    align: center middle;
+    content-align: center middle;
+    background: $surface;
 }
 
 Button{
@@ -24,6 +39,7 @@ Button{
 .save_message {
     text-style: bold;
     height: auto;
+    width: 100%;
     content-align: center top;
 }
 .buttons {
