@@ -100,7 +100,7 @@ def generate_dataflow(
         data_req_readout_net_rule,
         data_req_trig_net_rule,
     ]
-    dfo_netrules = [td_dfo_net_rule, ti_net_rule, df_hb_net_rule]
+    dfo_netrules = [td_dfo_net_rule, ti_net_rule]
     tpw_netrules = [tpset_net_rule]
 
     opmon_conf = db.get_dal(class_name="OpMonConf", uid="slow-all-monitoring")
