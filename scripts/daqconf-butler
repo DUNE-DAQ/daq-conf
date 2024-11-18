@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+import click
+from rich import print
+
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+@click.group(context_settings=CONTEXT_SETTINGS)
+def cli():
+    pass
+
+@cli.command(short_help="Enable resources in a DAQ session")
+def enable_resource():
+    pass
+
+@cli.command()
+def enable_tpg():
+    pass
+
+if __name__ == '__main__':
+    cli()

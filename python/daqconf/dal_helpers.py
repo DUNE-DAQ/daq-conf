@@ -4,12 +4,21 @@
 # Dal helpers
 #
 def get_attribute_info(o):
+    """
+    Return attributes schema information of a dal object
+    """
     return o.__schema__['attribute']
 
 def get_relation_info(o):
+    """
+    Return relationships schema information of a dal object
+    """
     return o.__schema__['relation']
 
 def get_attribute_list(o):
+    """
+    Return the list of attributes of a dal object
+    """
     return list(get_attribute_info(o))
 
 def get_relation_list(o):
