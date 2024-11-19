@@ -54,8 +54,7 @@ def generate_dataflow(
         hosts.append("vlocalhost")
 
     # Services
-    dfo_control = db.get_dal(class_name="Service", uid="dfo-01_control")
-    tpw_control = db.get_dal(class_name="Service", uid="tp-stream-writer_control")
+    daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control_interface")
 
     # Source IDs
     tpw_source_id = db.get_dal("SourceIDConf", uid="srcid-tp-stream-writer")
@@ -108,7 +107,7 @@ def generate_dataflow(
         "dfo-01",
         runs_on=host,
         application_name="daq_application",
-        exposes_service=[dfo_control],
+        exposes_service=[daqapp_control],
         network_rules=dfo_netrules,
         opmon_conf=opmon_conf,
         dfo=dfo_conf,
@@ -128,18 +127,11 @@ def generate_dataflow(
         )
         db.update_dal(dfapp_source_id)
 
-        dfapp_control = dal.Service(
-            f"df-{dfapp_id:02}_control",
-            protocol="rest",
-            port=0,
-        )
-        db.update_dal(dfapp_control)
-
         dfapp = dal.DFApplication(
             f"df-{dfapp_id:02}",
             runs_on=host,
             application_name="daq_application",
-            exposes_service=[dfapp_control],
+            exposes_service=[daqapp_control],
             source_id=dfapp_source_id,
             queue_rules=dfapp_qrules,
             network_rules=dfapp_netrules,
@@ -161,7 +153,7 @@ def generate_dataflow(
             "tp-stream-writer",
             runs_on=host,
             application_name="daq_application",
-            exposes_service=[tpw_control],
+            exposes_service=[daqapp_control],
             source_id=tpw_source_id,
             network_rules=tpw_netrules,
             opmon_conf=opmon_conf,
@@ -172,9 +164,8 @@ def generate_dataflow(
 
     if generate_segment:
         fsm = db.get_dal(class_name="FSMconfiguration", uid="FSMconfiguration_noAction")
-        controller_service = dal.Service(
-            "df-controller_control", protocol="grpc", port=0
-        )
+        controller_service = db.get_dal(class_name="Service", uid="drunc_control_interface")
+
         db.update_dal(controller_service)
         controller = dal.RCApplication(
             "df-controller",
@@ -243,9 +234,8 @@ def generate_hsi(
         hosts.append("vlocalhost")
 
     # Services
-    hsi_control = db.get_dal(class_name="Service", uid="hsi-01_control")
+    daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control_interface")
     dataRequests = db.get_dal(class_name="Service", uid="dataRequests")
-    tc_app_control = db.get_dal(class_name="Service", uid="hsi-to-tc-app_control")
     hsievents = db.get_dal(class_name="Service", uid="HSIEvents")
 
     # Source IDs
@@ -278,7 +268,7 @@ def generate_hsi(
         "hsi-01",
         runs_on=host,
         application_name="daq_application",
-        exposes_service=[hsi_control],
+        exposes_service=[daqapp_control],
         source_id=hsi_source_id,
         queue_rules=hsi_qrules,
         network_rules=hsi_netrules,
@@ -294,7 +284,7 @@ def generate_hsi(
         "hsi-to-tc-app",
         runs_on=host,
         application_name="daq_application",
-        exposes_service=[dataRequests, hsievents, tc_app_control],
+        exposes_service=[dataRequests, hsievents, daqapp_control],
         source_id=hsi_tc_source_id,
         network_rules=tc_netrules,
         opmon_conf=opmon_conf,
@@ -304,10 +294,7 @@ def generate_hsi(
 
     if generate_segment:
         fsm = db.get_dal(class_name="FSMconfiguration", uid="FSMconfiguration_noAction")
-        controller_service = dal.Service(
-            "hsi-controller_control", protocol="grpc", port=0
-        )
-        db.update_dal(controller_service)
+        controller_service = db.get_dal(classn_name="Service", uid="drunc_control_interface")
         controller = dal.RCApplication(
             "hsi-controller",
             application_name="drunc-controller",
@@ -340,7 +327,7 @@ def generate_readout(
   ReadoutApplications defined in a readout map.
 
     The file will automatically include the relevant schema files and
-  any other OKS files you specify. 
+  any other OKS files you specify.
 
    Example:
      generate_readoutOKS -i hosts \
@@ -433,6 +420,8 @@ def generate_readout(
     db.set_active(oksfile)
 
     detector_connections = db.get_dals(class_name="DetectorToDaqConnection")
+    daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control_interface")
+    drunc_control = db.get_dal(class_name="Service", uid="drunc_control_interface")
 
     try:
         rule = db.get_dal(
@@ -603,9 +592,7 @@ def generate_readout(
                     )
 
             datareader = nicrec
-            wiec_control = dal.Service(
-                f"wiec-{connection.id}_control", protocol="rest", port=0
-            )
+            wiec_control = db.get_dal()
             db.update_dal(wiec_control)
 
             wiec_app = dal.WIECApplication(
