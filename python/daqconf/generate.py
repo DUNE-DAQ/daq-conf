@@ -966,6 +966,15 @@ def generate_trigger(
     )
     db.update_dal(mlt)
 
+    replay = dal.TriggerReplayApplication(
+        "replay",
+        runs_on=host,
+        application_name="daq_application",
+        exposes_service=[],
+        opmon_conf=opmon_conf
+    )
+    db.update_dal(replay)
+
     if tpg_enabled:
         ta_subscriber = db.get_dal(class_name="DataReaderConf", uid="ta-subscriber-1")
         ta_handler = db.get_dal(class_name="DataHandlerConf", uid="def-ta-handler")
@@ -1003,7 +1012,7 @@ def generate_trigger(
         seg = dal.Segment(
             f"trg-segment",
             controller=controller,
-            applications=[mlt] + ([tcmaker] if tpg_enabled else []),
+            applications=[mlt] + [replay] + ([tcmaker] if tpg_enabled else []),
         )
         db.update_dal(seg)
 
