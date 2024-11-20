@@ -55,7 +55,7 @@ def generate_dataflow(
 
     # Services
     daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
-    drunc_control = db.get_dal(class_name="Service", uid="drunc_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
 
     # Source IDs
     tpw_source_id = db.get_dal("SourceIDConf", uid="srcid-tp-stream-writer")
@@ -171,7 +171,7 @@ def generate_dataflow(
             runs_on=host,
             fsm=fsm,
             opmon_conf=opmon_conf,
-            exposes_service=[drunc_control],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
 
@@ -233,7 +233,7 @@ def generate_hsi(
 
     # Services
     daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
-    drunc_control = db.get_dal(class_name="Service", uid="drunc_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
     dataRequests = db.get_dal(class_name="Service", uid="dataRequests")
     hsievents = db.get_dal(class_name="Service", uid="HSIEvents")
 
@@ -299,7 +299,7 @@ def generate_hsi(
             runs_on=host,
             fsm=fsm,
             opmon_conf=opmon_conf,
-            exposes_service=[drunc_control],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
 
@@ -419,7 +419,7 @@ def generate_readout(
 
     detector_connections = db.get_dals(class_name="DetectorToDaqConnection")
     daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
-    drunc_control = db.get_dal(class_name="Service", uid="drunc_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
 
     try:
         rule = db.get_dal(
@@ -677,7 +677,7 @@ def generate_readout(
             runs_on=host,
             fsm=fsm,
             opmon_conf=opmon_conf,
-            exposes_service=[drunc_control],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
         db.commit()
@@ -737,7 +737,7 @@ def generate_fakedata(
     fakeapps = []
     # Services
     daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
-    drunc_control = db.get_dal(class_name="Service", uid="drunc_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
     dataRequests = db.get_dal(class_name="Service", uid="dataRequests")
     timeSyncs = db.get_dal(class_name="Service", uid="timeSyncs")
     opmon_conf = db.get_dal(class_name="OpMonConf", uid="slow-all-monitoring")
@@ -810,7 +810,7 @@ def generate_fakedata(
             opmon_conf=opmon_conf,
             runs_on=host,
             fsm=fsm,
-            exposes_service=[drunc_control],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
 
@@ -875,7 +875,7 @@ def generate_trigger(
 
     # Services
     daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
-    drunc_control = db.get_dal(class_name="Service", uid="drunc_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
     dataRequests = db.get_dal(class_name="Service", uid="dataRequests")
     triggerActivities = db.get_dal(class_name="Service", uid="triggerActivities")
     triggerCandidates = db.get_dal(class_name="Service", uid="triggerCandidates")
@@ -963,7 +963,7 @@ def generate_trigger(
             opmon_conf=opmon_conf,
             runs_on=host,
             fsm=fsm,
-            exposes_service=[drunc_control],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
 
@@ -1026,13 +1026,13 @@ def generate_session(
         hosts.append("vlocalhost")
 
     fsm = db.get_dal(class_name="FSMconfiguration", uid="fsmConf-test")
-    drunc_control = db.get_dal(class_name="Service", uid="drunc_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
     controller = dal.RCApplication(
         "root-controller",
         application_name="drunc-controller",
         runs_on=host,
         fsm=fsm,
-        exposes_service=[drunc_control],
+        exposes_service=[rccontroller_control],
     )
     db.update_dal(controller)
 
