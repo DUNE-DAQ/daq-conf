@@ -540,6 +540,11 @@ def show_object_tree(obj, uid, show_attrs, focus_path, level):
 @cli.command(short_help="Show detector-daq connections")
 @click.pass_obj
 def show_d2d_connections(obj):
+    """
+    Shows the DetectorToDAQ connections in the database
+
+    The receiver id and summary sender informations for each connection are shown in a compact table.
+    """
 
 
     from rich.highlighter import ReprHighlighter
