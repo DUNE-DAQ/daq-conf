@@ -3,8 +3,7 @@ from textual.geometry import Region
 from textual.widgets import Static, Button, ContentSwitcher
 from textual.containers import Horizontal
 
-from daqconf.textual_dbe.widgets.selection_menu import SelectionMenu
-
+from daqconf.cider.widgets.selection_menu import SelectionMenu
 
 class SelectionPanel(Static):
     """Selection panel structure. Allows user to select between different configuration views
@@ -12,15 +11,13 @@ class SelectionPanel(Static):
     
     _current_menu = None
     _saved_states = None
-    _menu_ids = {"Sort By Class" : "class-selection",
-                    "Sort By Relationship" : "relation-selection"}
+    _menu_ids = {"Class View" : "class-selection",
+                    "Session View" : "relation-selection"}
     
     def compose(self) -> ComposeResult:
         """Compose the selection panel for use in the app
         """        
         # There has to be a better way of doing this
-        
-        
         with Horizontal(id="buttons"):
             for label, id in self._menu_ids.items():
                 yield Button(label, id=id)
@@ -34,7 +31,7 @@ class SelectionPanel(Static):
         with ContentSwitcher(initial=self._current_menu):
             for i, id in enumerate(self._menu_ids.values()):
                 
-                menu =  SelectionMenu(id=id)                
+                menu =  SelectionMenu(id=id)           
                 yield menu
 
     
@@ -57,4 +54,5 @@ class SelectionPanel(Static):
         """Swap between different configuration views via button. Currently bound here for...reasons
         """        
         self.query_one(ContentSwitcher).current = event.button.id
+        self._current_menu = event.button.id
         # Also swap this around so refreshing is smoother!

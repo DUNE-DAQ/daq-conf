@@ -5,10 +5,10 @@ from typing import Dict
 from textual.widgets import Static
 from textual.message import Message
 
-from daqconf.textual_dbe.data_structures.structured_configuration import StructuredConfiguration
-from daqconf.textual_dbe.data_structures.configuration_handler import ConfigurationHandler
-from daqconf.textual_dbe.data_structures.selection_interface_factory import SelectionInterfaceFactory
-from daqconf.textual_dbe.data_structures.selection_interface import SelectionInterface
+from daqconf.cider.data_structures.structured_configuration import StructuredConfiguration
+from daqconf.cider.data_structures.configuration_handler import ConfigurationHandler
+from daqconf.cider.data_structures.selection_interface_factory import SelectionInterfaceFactory
+from daqconf.cider.data_structures.selection_interface import SelectionInterface
 
 class ConfigurationController(Static):    
     """Controller widget for the full configuration. In principal this is 
@@ -142,7 +142,8 @@ class ConfigurationController(Static):
     def rename_dal(self, new_name: str)->None:
         """Rename the currently selected object [NOT TESTED]
         """        
-        self._current_selected_object.rename_object(new_name)
+        self._current_selected_object.rename(new_name)
+        self._handler.configuration_handler.configuration.update_dal(self._current_selected_object)    
 
     def add_new_conf_obj(self, class_id: str, uid: str):
         """Add new object to configuration
@@ -156,6 +157,10 @@ class ConfigurationController(Static):
         self._handler.configuration_handler.destroy_conf_obj(class_id, uid)
         self._logger.write(f"[green]Destroyed configuration object[/green] [red]{class_id}[/red]@[yellow]{uid}[/yellow]")
 
+    def destroy_current_object(self):
+        if self.current_dal is not None:
+            self.destroy_conf_obj(self.current_dal.className(), getattr(self.current_dal, 'id'))
+        # self.current_dal = None
 
     def can_be_disabled(self)->bool:
         """Check if current object is capable of being disabled
@@ -226,3 +231,68 @@ class ConfigurationController(Static):
             """Notify if/when configuration is changed"""
             super().__init__()
             self.dal = dal
+            
+    def modify_current_dal_relationship(self, relationship_name: str, updated_value, append: bool=False):
+        # Wrapper method for changing value of relationship to anythings
+        self.__no_handler_error()
+        self.handler.configuration_handler.modify_relationship(self._current_selected_object.className(),
+                                          getattr(self._current_selected_object, 'id'),
+                                          relationship_name, updated_value, append)
+        
+    def remove_current_dal_relationship(self, relationship_name):
+        # Wrapper method for setting relationship value to None
+        self.__no_handler_error()
+        self.handler.configuration_handler.modify_relationship(self._current_selected_object.className(),
+                                          getattr(self._current_selected_object, 'id'),
+                                          relationship_name, 
+                                          None)
+
+    def pop_dal_relationship(self, relationship_name, dal_to_remove):
+        # Wrapper method for removing dal from multi-value relationship
+        self.__no_handler_error()
+        
+        if dal_to_remove is None:
+            raise Exception("Relationship is already emptied")
+        
+        relationship_dict = self.get_relation_category_in_current_dal(relationship_name)
+                
+        relationships = relationship_dict[relationship_name]
+        
+        if not relationship_dict['rel_info']['multivalue']:
+            self.remove_current_dal_relationship(relationship_name)
+            return
+        
+        # Grab index of dal to be removed
+        try:
+            dal_idx = relationships.index(dal_to_remove)
+        except:
+            raise Exception(relationships)
+        
+        relationships.pop(dal_idx)
+        
+        
+        setattr(self._current_selected_object, relationship_name, relationships)
+        
+    # Some wrapper methods to avoid needing to call the base handler object
+    def get_dals_of_class(self, dal_class: str):
+        return self._handler.configuration_handler.get_conf_objects_class(dal_class)
+    
+    def get_list_of_classes(self):
+        return list(self._handler.configuration_handler.get_all_conf_classes().keys())
+    
+    def get_relations_to_current_dal(self):
+        return self._handler.configuration_handler.get_relationships_for_conf_object(self.current_dal)
+    
+    # Maybe move to handler...
+    def get_relation_category_in_current_dal(self, relation_name: str):
+        relations = self.get_relations_to_current_dal()
+        
+        # Find the correct category
+        for rel in relations:
+            if list(rel.keys())[0] != relation_name:
+                continue
+            
+            # Found correct_relation
+            return rel
+        
+        raise RuntimeError(f"Error cannot find relation: {relation_name} in {self.generate_rich_string(self._current_selected_object)}")

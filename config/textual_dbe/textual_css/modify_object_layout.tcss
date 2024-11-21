@@ -1,0 +1,28 @@
+ConfigObjectModifierScreen{
+    align: center middle;
+}
+
+SingleRelationshipModifier{
+    grid-size: 3;
+    grid-gutter: 1 2;
+    grid-rows: 1fr 3;
+    background: grey 10%;
+}
+
+Select{
+    column-span: 2;
+    width: 80%
+}
+#delete_rel{
+    column-span: 1;
+}
+
+RelationshipTypeGroup{
+    border: thick $background 80%;
+    padding: 0 1;
+    background: $surface;
+}
+
+RelationshipSelectPanel{
+    height: 80%
+}
