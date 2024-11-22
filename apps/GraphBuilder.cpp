@@ -405,11 +405,11 @@ namespace daqconf {
         throw exc;                                                                                         
       }
 
-      auto daqapp = local_database->get<dunedaq::appmodel::SmartDaqApplication>(object.UID());                 
-      if (daqapp) {
-        auto local_session = const_cast<dunedaq::confmodel::Session*>(  // NOLINT
-                                                                      local_database->get<dunedaq::confmodel::Session>(m_session_name));
-        auto modules = daqapp->generate_modules(local_database, m_oksfilename, local_session);
+    auto daqapp = local_database->get<dunedaq::appmodel::SmartDaqApplication>(object.UID());
+    if (daqapp) {
+      auto local_session = const_cast<dunedaq::confmodel::Session*>( // NOLINT
+        local_database->get<dunedaq::confmodel::Session>(m_session_name));
+      auto modules = daqapp->generate_modules(local_session);
 
         std::vector<std::string> allowed_conns {};
 
