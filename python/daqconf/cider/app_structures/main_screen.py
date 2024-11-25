@@ -65,14 +65,17 @@ class MainScreen(Screen):
     def set_initial_input_file(self, input_file: str):
         self._init_input = input_file
 
-
     def update_with_new_input(self, input_file_name: str):
         '''
         Update main screen to have a new input file.
         '''
         self._init_input = input_file_name
         
-        self._config_controller.new_handler_from_str(input_file_name)
+        try:
+            self._config_controller.new_handler_from_str(input_file_name)
+        except Exception as e:
+            self.logger.write_error(e)
+            return
 
         # Add interfaces
         self._config_controller.add_interface("class-selection")
@@ -81,8 +84,8 @@ class MainScreen(Screen):
         # Mount the selection panel
         try:
             self.mount(SelectionPanel())
-        except:
-            raise Exception("Selection panel not found, something's gone wrong")
+        except Exception as e:
+            raise e
 
         # Mount config table
         try:
