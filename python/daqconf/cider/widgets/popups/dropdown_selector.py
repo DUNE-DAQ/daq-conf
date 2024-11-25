@@ -21,7 +21,7 @@ class SelectSession(Static):
         
         yield selection_list
         yield Button("Apply", id="apply")
-        yield Button("Cancel", id="cancel")
+        yield Button("Close", id="cancel")
     
     def on_button_pressed(self, event: Button.Pressed):
                 
@@ -32,13 +32,13 @@ class SelectSession(Static):
             selected_sessions = [(s, s in selection_list) for s in self._sessions]
 
             self._configuration_controller.toggle_disable_conf_obj(selected_sessions)
+        else:
+            menu = self.app.get_screen("main").query_one("SelectionPanel")
+            menu.save_menu_state()
+            menu.refresh(recompose=True)
+            menu.restore_menu_state()
 
-        menu = self.app.get_screen("main").query_one("SelectionPanel")
-        menu.save_menu_state()
-        menu.refresh(recompose=True)
-        menu.restore_menu_state()
-
-        self.app.screen.dismiss(result="cancel")
+            self.app.screen.dismiss(result="cancel")
         
 
 class SelectSessionScreen(ModalScreen):
