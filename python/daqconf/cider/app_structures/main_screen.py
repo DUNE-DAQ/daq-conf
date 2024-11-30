@@ -26,12 +26,12 @@ class MainScreen(Screen):
     BINDINGS = [
                 # Binding("ctrl+s", "save_configuration", "Save Configuration"),
                 Binding("ctrl+s", "save_configuration_with_message", "Save Configuration"),
-                Binding("ctrl+o", "open_configuration", "Open Configuration"),
+                Binding("o", "open_configuration", "Open Configuration"),
                 Binding("ctrl+q", "request_quit", "Exit Cider"),
-                Binding("ctrl+e", "modify_relations", "Modify Relation to Object"),
-                Binding("ctrl+r", "rename_configuration", "Rename Conf Object"),
+                Binding("e", "modify_relations", "Modify Relation to Object"),
+                Binding("r", "rename_configuration", "Rename Conf Object"),
                 Binding("d", "toggle_disable", "Toggle Disable"),
-                Binding("ctrl+a", "add_configuration", "Add Conf Object"),
+                Binding("a", "add_configuration", "Add Conf Object"),
                 Binding("ctrl+d", "destroy_configuration", "Delete Conf Object"),
             ]
     
