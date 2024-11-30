@@ -21,7 +21,7 @@ class SelectSession(Static):
         
         yield selection_list
         yield Button("Apply", id="apply")
-        yield Button("Cancel", id="cancel")
+        yield Button("Close", id="cancel")
     
     def on_button_pressed(self, event: Button.Pressed):
                 
@@ -32,18 +32,18 @@ class SelectSession(Static):
             selected_sessions = [(s, s in selection_list) for s in self._sessions]
 
             self._configuration_controller.toggle_disable_conf_obj(selected_sessions)
+        else:
+            menu = self.app.get_screen("main").query_one("SelectionPanel")
+            menu.save_menu_state()
+            menu.refresh(recompose=True)
+            menu.restore_menu_state()
 
-        menu = self.app.get_screen("main").query_one("SelectionPanel")
-        menu.save_menu_state()
-        menu.refresh(recompose=True)
-        menu.restore_menu_state()
-
-        self.app.screen.dismiss(result="cancel")
+            self.app.screen.dismiss(result="cancel")
         
 
 class SelectSessionScreen(ModalScreen):
-    # css_file_path = f"{environ.get('DBT_AREA_ROOT')}/sourcecode/daqconf/python/daqconf/textual_dbe/textual_css"
-    # CSS_PATH = f"{css_file_path}/session_selection_layout.tcss"
+    css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
+    CSS_PATH = f"{css_file_path}/session_selection_layout.tcss"
 
     def compose(self):
         yield SelectSession()

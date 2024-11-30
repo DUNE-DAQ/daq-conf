@@ -1,0 +1,9 @@
+SelectSessionScreen{
+    align: center middle;
+}
+
+SelectSession{
+    border: thick $background 80%;
+    width: 60;
+    background: grey 10%;
+}

@@ -135,8 +135,9 @@ class MainScreen(Screen):
         if self._config_controller.can_be_disabled():
             await self.app.push_screen(SelectSessionScreen())
         
-        # except:
-        self.query_one(RichLogWError).write_error("Could not toggle disable configuration object")
+        else:        
+            # except:
+            self.query_one(RichLogWError).write_error("Could not toggle disable configuration object")
 
     
     def call_quit_handler(self):
