@@ -1,12 +1,15 @@
 #!/bin/env python3
 import click
 from daqconf.consolidate import consolidate_files
+from daqconf.utils import log_levels, setup_logging
 
 @click.command()
 @click.option('--oksfile', '-i', help='Input database(s) to read', multiple=True)
+@click.option('--log-level', '-l', help='Log level', default='INFO', type=click.Choice(log_levels, case_sensitive=False))
 @click.argument('output_file')
-def consolidate(oksfile, output_file):
-    consolidate_files(output_file, *oksfile)  
+def consolidate(oksfile, output_file, log_level):
+    setup_logging(log_level)
+    consolidate_files(output_file, *oksfile)
 
 if __name__ == '__main__':
     consolidate()
