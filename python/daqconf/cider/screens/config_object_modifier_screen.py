@@ -1,8 +1,5 @@
 
 from daqconf.cider.widgets.modify_config_relations import RelationshipSelectPanel
-from daqconf.cider.widgets.config_table import ConfigTable
-from daqconf.cider.widgets.configuration_controller import ConfigurationController
-from daqconf.cider.widgets.popups.file_io import RenameConfigObject
 
 from textual.containers import Grid
 from textual.screen import ModalScreen

@@ -1,8 +1,6 @@
-from os import environ
 
 from textual.widgets import Static, SelectionList, Button
 from textual.widgets.selection_list import Selection
-from textual.screen import ModalScreen
 
 
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
@@ -41,12 +39,3 @@ class SelectSession(Static):
         self.app.screen.dismiss(result="cancel")
         
 
-class SelectSessionScreen(ModalScreen):
-    css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
-    CSS_PATH = f"{css_file_path}/session_selection_layout.tcss"
-
-    def compose(self):
-        yield SelectSession()
-        
-    def on_mount(self)->None:
-        self.query_one(SelectSession).focus()

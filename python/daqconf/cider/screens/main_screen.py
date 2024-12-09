@@ -6,16 +6,18 @@ from textual.binding import Binding
 from daqconf.cider.widgets.custom_rich_log import RichLogWError
 from daqconf.cider.widgets.config_table import ConfigTable
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
-from daqconf.cider.widgets.popups.file_io import SaveWithMessageScreen, OpenFileScreen
-from daqconf.cider.widgets.popups.dropdown_selector import SelectSessionScreen
-from daqconf.cider.app_structures.selection_panel import SelectionPanel
-from daqconf.cider.widgets.popups.quit_screen import QuitScreen
-from daqconf.cider.widgets.popups.config_object_modifier_screen import ConfigObjectModifierScreen
-from daqconf.cider.widgets.popups.add_objects import AddNewObjectScreen
-from daqconf.cider.widgets.popups.delete_object_screen import DeleteConfigObjectScreen
-from daqconf.cider.widgets.popups.file_io import RenameConfigObjectScreen
+from daqconf.cider.screens.menu_with_buttons_screen import OpenFileScreen
+from daqconf.cider.screens.select_session_screen import SelectSessionScreen
+from daqconf.cider.widgets.selection_panel import SelectionPanel
+from daqconf.cider.screens.quit_screen import QuitScreen
+from daqconf.cider.screens.config_object_modifier_screen import ConfigObjectModifierScreen
+from daqconf.cider.screens.add_objects_screen import AddNewObjectScreen
+from daqconf.cider.screens.delete_object_screen import DeleteConfigObjectScreen
+from daqconf.cider.screens.menu_with_buttons_screen import RenameConfigObjectScreen
 
 from os import path
+
+from daqconf.cider.screens.menu_with_buttons_screen import SaveWithMessageScreen
 
 
 class MainScreen(Screen):

@@ -4,7 +4,7 @@ Table for displaying DAL information
 from textual.widgets import Static, DataTable
 from textual.reactive import reactive
 
-from daqconf.cider.widgets.popups.edit_cell_screen import EditCellScreen
+from daqconf.cider.screens.edit_cell_screen import EditCellScreen
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
 
 class ConfigTable(Static):

@@ -1,9 +1,6 @@
-from os import environ
 
 from textual.widgets import Static, Input, Select, Button
 from textual.containers import Container, Horizontal
-from textual.screen import ModalScreen
-from textual.app import ComposeResult
 
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
 from daqconf.cider.widgets.custom_rich_log import RichLogWError
@@ -49,18 +46,4 @@ class AddNewObject(Static):
         self.app.screen.dismiss()
 
     
-class AddNewObjectScreen(ModalScreen[bool]):
-    css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
-    
-    CSS_PATH = f"{css_file_path}/add_object_layout.tcss"
-    """
-    Splash screen for adding configuration
-    """
-    
-    def compose(self)->ComposeResult:     
-        yield AddNewObject()
-    
-    def on_mount(self) -> None:
-        message_box = self.query_one(AddNewObject)
-        message_box.focus()
         
