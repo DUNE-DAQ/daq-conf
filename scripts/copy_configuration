@@ -2,13 +2,18 @@
 import click
 import pathlib
 from daqconf.consolidate import copy_configuration
+from daqconf.utils import log_levels, setup_logging
 
 @click.command()
 @click.argument('output_directory', type=click.Path(exists=True), nargs=1)
 @click.argument('databases', nargs=-1)
-def copy_config(output_directory, databases):
-    """Copy to OUTPUT_DIRECTORY configuration represented by DATABASES"""
-    copy_configuration(pathlib.Path(output_directory), databases)  
+@click.option('--log-level', '-l', help='Log level', default='INFO', type=click.Choice(log_levels, case_sensitive=False))
+def copy_config(output_directory, databases, log_level):
+    """
+    Copy to OUTPUT_DIRECTORY configuration represented by DATABASES
+    """
+    setup_logging(log_level)
+    copy_configuration(pathlib.Path(output_directory), databases)
 
 if __name__ == '__main__':
     copy_config()
