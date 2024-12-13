@@ -37,5 +37,3 @@ class SelectSession(Static):
         menu.restore_menu_state()
 
         self.app.screen.dismiss(result="cancel")
-        
-
