@@ -1,0 +1,16 @@
+#!/bin/env python3
+import click
+from daqconf.cider.apps.shifter_cider import ShifterCider
+
+@click.command()
+@click.option('-d', '--input-directory', 'input_directory', default=None, required=False)
+def shifter_cider(input_directory):
+    
+    app = ShifterCider(input_directory)    
+    app.run()
+    print("To run DRUNC please copy/paste: ")
+    print(app.exit_message())
+
+# Run dbe-screen
+if __name__=="__main__":
+    shifter_cider()

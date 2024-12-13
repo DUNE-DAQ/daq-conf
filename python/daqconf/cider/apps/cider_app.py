@@ -2,7 +2,7 @@
 App for testing configuration 
 '''
 from os import environ
-from daqconf.cider.screens.cider_main_screen import CiderMainScreen
+from daqconf.cider.screens.main_screen import MainScreen
 
 # Textual Imports
 from textual.app import App
@@ -12,7 +12,7 @@ class Cider(App):
     css_file_path = f"{environ.get('DAQCONF_SHARE')}/config/textual_dbe/textual_css"
 
     CSS_PATH = f"{css_file_path}/main_app_layout.tcss"
-    SCREENS = {"main": CiderMainScreen}
+    SCREENS = {"main": MainScreen}
     
     _input_file_name = None
     

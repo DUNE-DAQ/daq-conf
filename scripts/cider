@@ -1,12 +1,12 @@
 #!/bin/env python3
 import click
-from daqconf.cider.daq_app import main_app
+from daqconf.cider.apps.cider_app import Cider
 
 @click.command()
 @click.option('-f', '--input-file', 'input_file', default=None, required=False)
-def textual_dbe(input_file):
+def cider(input_file):
     
-    app = main_app.DbeApp()
+    app = Cider()
     
     if input_file is not None:
         app.set_input_file(input_file)
@@ -15,4 +15,4 @@ def textual_dbe(input_file):
 
 # Run dbe-screen
 if __name__=="__main__":
-    textual_dbe()
+    cider()
