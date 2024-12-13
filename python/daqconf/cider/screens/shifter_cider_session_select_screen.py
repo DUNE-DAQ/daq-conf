@@ -29,7 +29,7 @@ class ShifterSelectionScreen(Screen):
         self._selected_session_name = ""
     
     def compose(self):
-        yield Label("I'm here")
+
         yield Grid(
             self._select_file,
             self._select_session,
@@ -89,12 +89,15 @@ class ConsolidateDB:
     # I need a utils package...
     @classmethod
     def create_timestamped_file_string(cls, file_path: str)->str:
-        # basepath = file_path.strip(".data.xml")
-        # ts = datetime.datetime.now().isoformat()
+        basepath = file_path.strip(".data.xml")
+        ts = datetime.datetime.now().isoformat()
         
-        # return f"{basepath}.{ts}.data.xml"
-        return "test_config.data.xml"
-    
+        ts=ts.replace(":",".")
+
+        
+        return f"{basepath}_{ts}.data.xml"
+        # return "test_config.data.xml"
+    # 
     def get_all_includes(self, db, file):
         includes = db.get_includes(file)
         for include in includes:

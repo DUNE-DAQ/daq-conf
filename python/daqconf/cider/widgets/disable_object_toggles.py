@@ -47,7 +47,7 @@ class DisableObjectToggles(Static):
             if options["ApplyToAllDALs"]:
                 output_dict[config_opt] = options
                 # Get all of them
-                options["OutputDal"] = [d for d in dal_objs if d.className() not in ignored]
+                options["ObjectDal"] = [d for d in dal_objs if d.className() not in ignored]
                 continue
             
             for dal in dal_objs:
@@ -115,10 +115,10 @@ class ExitScreen(Screen):
 
     def compose(self):
         yield Grid(
-            Label(f"Please copy/paste {self._message}", id="question"),
+            Label(f"Are you happy with the config?", id="question"),
             # Button("Copy Command", variant="success", id="copy"),
-            Button("Quit", variant="error", id="quit"),
-            Button("Cancel", variant="warning", id="cancel"),
+            Button("Yep!", variant="success", id="quit"),
+            Button("Nope!", variant="warning", id="cancel"),
 
             id="dialog",
         )
