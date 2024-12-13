@@ -7,6 +7,7 @@ AddNewObjectScreen{
 AddNewObject{
     width: 80%;
     content-align-horizontal: center;
+
 }
 
 #object_add_box{
