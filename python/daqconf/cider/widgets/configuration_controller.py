@@ -14,7 +14,6 @@ class ConfigurationController(Static):
     """Controller widget for the full configuration. In principal this is 
     where all communication with the configuration is actually done!
     """
-    BINDINGS = [("ctrl+s", "save_configuration", "Save Configuration")]
 
     _handler: StructuredConfiguration | None = None
     _selection_interfaces: Dict[str, SelectionInterface] = {}
@@ -62,7 +61,6 @@ class ConfigurationController(Static):
         if self.handler is None:
             self._logger.write_error("No handler has been setup")
 
-        
         try:
             setattr(self._current_selected_object, attr_name, update_value)
             self._handler.configuration_handler.configuration.update_dal(self._current_selected_object)        
@@ -80,7 +78,6 @@ class ConfigurationController(Static):
             self._handler = StructuredConfiguration(file_name)
         except Exception as e:
             raise e
-            
             
     @property
     def handler(self)->StructuredConfiguration | None:
@@ -180,7 +177,6 @@ class ConfigurationController(Static):
 
         return True
 
-
     def toggle_disable_conf_obj(self, selection_menu)->None:
         """Disable current object in configuration
         """
@@ -190,7 +186,6 @@ class ConfigurationController(Static):
         # Loop over all sessions [note currently this is badly implemented]
         for session, toggle_enable in selection_menu:
             session_disabled_elements = session.disabled
-
 
             # Make sure if nothing's happening we don't do anything
             if self._current_selected_object not in session_disabled_elements and toggle_enable:
@@ -208,9 +203,9 @@ class ConfigurationController(Static):
                 
                 if self._current_selected_object not in session_disabled_elements:
                     session_disabled_elements.append(self._current_selected_object)
-                
+
             session.disabled = session_disabled_elements
-            self._handler.configuration_handler.configuration.update_dal(session)        
+            self._handler.configuration_handler.configuration.update_dal(session)
         self._logger.write("[red]=============================\n")
 
 
@@ -295,3 +290,11 @@ class ConfigurationController(Static):
             return rel
         
         raise RuntimeError(f"Error cannot find relation: {relation_name} in {self.generate_rich_string(self._current_selected_object)}")
+    
+    def set_attribute_value_for_dals(self, attribute_label: str, dal_class: str, attribute_value):
+        '''
+        Loop over all dals of class, check if they have an attribute + set it to some value
+        '''
+        for dal in self.get_dals_of_class(dal_class):
+            if attribute_label in dir(dal):
+                setattr(dal, attribute_label, attribute_value)
