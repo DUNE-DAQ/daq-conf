@@ -3,7 +3,6 @@ from textual.widgets import Static, Input, Select, Button
 from textual.containers import Container, Horizontal
 
 from daqconf.cider.widgets.configuration_controller import ConfigurationController
-from daqconf.cider.widgets.custom_rich_log import RichLogWError
 
 class AddNewObject(Static):
     def compose(self):
@@ -44,6 +43,3 @@ class AddNewObject(Static):
         selection_menu.refresh(recompose=True)
         selection_menu.restore_menu_state()
         self.app.screen.dismiss()
-
-    
-        

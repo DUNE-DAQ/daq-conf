@@ -1,0 +1,19 @@
+{"SwitchOptions": {
+    "Disable": {
+       "AffectedClasses" : "Component",
+       "AttributeName": "disable",
+       "AttributeIn": "Session",
+       "ApplyToAllDALs": false,
+       "Label": "Disable/enable"
+    },
+
+    "TPG_Disable": {
+        "AffectedClasses": "ReadoutApplication",
+        "AttributeName": "tp_generation_enabled",
+        "AttributeIn": "ReadoutApplication",
+        "ApplyToAllDALs": true,
+        "Label": "Disable TPG"
+    }
+},
+"IgnoredClasses": ["DetectorStream", "ConnectivityService", "Segment"]
+}

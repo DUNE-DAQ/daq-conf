@@ -38,8 +38,6 @@ class SingleRelationshipModifier(Static):
         self._config_controller: ConfigurationController = main_screen.query_one(ConfigurationController)
         self._logger:  RichLogWError = main_screen.query_one("#main_log")
 
-        # yield Grid(
-            # Actual dropdown menu
         yield Select([(repr(rel), rel) for 
                         rel in self._config_controller.get_dals_of_class(self._relationship_type)],
                 value=self._current_related_dal, id="select_obj")

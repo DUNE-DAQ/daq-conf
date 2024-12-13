@@ -103,7 +103,6 @@ class ConfigurationHandler:
                                 if self._configuration.is_subclass(class_, class_id)]
         return inherited_classes            
 
-    
     @property
     def configuration(self)->conffwk.Configuration:
         """Access the underlying configuration object
@@ -133,6 +132,19 @@ class ConfigurationHandler:
             DAL object satisfying the input
         """        
         return self.configuration.get_obj(class_id, uid)
+
+    def get_dal(self, class_id: str, uid: str):
+        """Get a particular configuration object 
+
+        Arguments:
+            class_id -- Class name
+            uid -- Unique object ID
+
+        Returns:
+            DAL object satisfying the input
+        """        
+        return self.configuration.get_dal(class_id, uid)
+
     
     def commit(self, update_message: str):
         """Commit changes to the database
@@ -141,6 +153,7 @@ class ConfigurationHandler:
             update_message -- Add message to the update
         """        
         self.configuration.commit(update_message)
+
 
     @property
     def n_dals(self)->int:
@@ -160,6 +173,9 @@ class ConfigurationHandler:
         config_as_dal = self.configuration.get_dal(class_id, uid)
         self.configuration.update_dal(config_as_dal)
         self._loaded_dals.append(config_as_dal)
+        
+    def copy_conf_obj(self, dal_obj):
+        self.configuration.add_dal(dal_obj)
 
     def destroy_conf_obj(self, class_id: str, uid: str):
         """Destroy a configuration object
@@ -171,7 +187,8 @@ class ConfigurationHandler:
         dal = self.configuration.get_dal(class_id, uid)
         self.configuration.destroy_dal(dal)
         self._loaded_dals.remove(dal)
-        
+    
+
     def modify_relationship(self, class_id, uid, relationship_name: str, updated_value,
                             append: bool=False):
         """Modify TODO: EDIT THIS
@@ -220,3 +237,5 @@ class ConfigurationHandler:
             return
         
         raise RuntimeError(f"Cannot find relationship with name {relationship_name}")
+    
+

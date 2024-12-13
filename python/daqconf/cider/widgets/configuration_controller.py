@@ -15,10 +15,11 @@ class ConfigurationController(Static):
     where all communication with the configuration is actually done!
     """
     BINDINGS = [("ctrl+s", "save_configuration", "Save Configuration")]
-
+ 
     _handler: StructuredConfiguration | None = None
     _selection_interfaces: Dict[str, SelectionInterface] = {}
     _current_selected_object = None
+    _current_file = None
 
     def on_mount(self):
         self._logger = self.app.query_one("RichLogWError")
@@ -77,10 +78,13 @@ class ConfigurationController(Static):
             file_name -- New database to load
         """ 
         try:
+            self._current_file = file_name
             self._handler = StructuredConfiguration(file_name)
         except Exception as e:
             raise e
             
+    def get_config_file_name(self):
+        return self._current_file
             
     @property
     def handler(self)->StructuredConfiguration | None:
@@ -189,20 +193,24 @@ class ConfigurationController(Static):
         # DAL as configuration object        
         # Loop over all sessions [note currently this is badly implemented]
         for session, toggle_enable in selection_menu:
-            session_disabled_elements = session.disabled
-
-            if toggle_enable and self._current_selected_object in session_disabled_elements:
-                # if self._current_selected_object in session_disabled_elements:            
-                    self._logger.write(f"Enabling {self.generate_rich_string(self._current_selected_object)} in {self.generate_rich_string(session)}")
-                    session_disabled_elements.remove(self._current_selected_object)
-
-            elif not toggle_enable and self._current_selected_object not in session_disabled_elements:
-                self._logger.write(f"Disabling {self.generate_rich_string(self._current_selected_object)} in {self.generate_rich_string(session)}")                
-                session_disabled_elements.append(self._current_selected_object)
-                
-            session.disabled = session_disabled_elements
-            self._handler.configuration_handler.configuration.update_dal(session)        
+            toggle_disable_conf_obj_in_session(session, toggle_enable)
         self._logger.write("[red]=============================\n")
+
+
+    def toggle_disable_conf_obj_in_session(self, session, toggle_enable: bool):
+        session_disabled_elements = session.disabled
+
+        if toggle_enable and self._current_selected_object in session_disabled_elements:
+            # if self._current_selected_object in session_disabled_elements:            
+            self._logger.write(f"Enabling {self.generate_rich_string(self._current_selected_object)} in {self.generate_rich_string(session)}")
+            session_disabled_elements.remove(self._current_selected_object)
+ 
+        elif not toggle_enable and self._current_selected_object not in session_disabled_elements:
+            self._logger.write(f"Disabling {self.generate_rich_string(self._current_selected_object)} in {self.generate_rich_string(session)}")                
+            session_disabled_elements.append(self._current_selected_object)
+
+        session.disabled = session_disabled_elements
+        self._handler.configuration_handler.configuration.update_dal(session)        
 
 
     def get_all_sessions(self)->list:

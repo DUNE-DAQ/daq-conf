@@ -27,7 +27,7 @@ class SelectionInterface(ABC):
         # Return the relationships between objects
         return self._relational_dict
     
-    
+
 # Couple of concrete classes
 class ClassSelectionMenu(SelectionInterface):
     '''Selection menu based purely on the class of objects
@@ -76,3 +76,5 @@ class RelationalSelectionMenu(SelectionInterface):
     
     def __repr__(self):
         return "RelationalSelectionMenu"
+    
+    

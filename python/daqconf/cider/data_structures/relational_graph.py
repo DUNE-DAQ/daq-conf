@@ -24,7 +24,7 @@ class RelationalGraph:
     def __generate_adjacency_matrix(self):
         """Generates adjacency matrix from configuration handler object i.e. finds connected DALs
         """
-        self._adjacency_matrix = np.zeros((self._handler.n_dals, self._handler.n_dals))
+        self._adjacency_matrix = np.zeros((self._handler.n_dals, self._handler.n_dals), dtype=int)
         
         for i, dal in enumerate(self._handler.conf_obj_list):
             for connection_category in self._handler.get_relationships_for_conf_object(dal):
@@ -32,7 +32,7 @@ class RelationalGraph:
                 for connection in list(connection_category.values())[0]:
                     # Loop over just conf objects
                     self._adjacency_matrix[i][self._handler.conf_obj_list.index(connection)] += 1
-  
+                      
     @property
     def adjacency_matrix(self)->NDArray:
         return self._adjacency_matrix
@@ -40,8 +40,8 @@ class RelationalGraph:
     @property
     def top_level_nodes(self):
         # Means we automatically rebuild the graph, this is inefficient but vaguely fine
-        self.__generate_adjacency_matrix()        
-        return [dal for i, dal in enumerate(self._handler.conf_obj_list) if np.all(self.adjacency_matrix[i])==0]
+        self.__generate_adjacency_matrix()
+        return [dal for i, dal in enumerate(self._handler.conf_obj_list) if np.all(self.adjacency_matrix.T[i]==0)]
 
 
 '''
