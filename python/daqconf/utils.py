@@ -1,5 +1,37 @@
-import os
 import glob
+import logging
+import os
+from rich.logging import RichHandler
+
+
+log_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+
+
+def setup_logging(level:str="INFO"):
+    level = level.upper()
+
+    loglevel = logging.INFO
+
+    match level:
+        case "DEBUG":
+            loglevel = logging.DEBUG
+        case "INFO":
+            loglevel = logging.INFO
+        case "WARNING":
+            loglevel = logging.WARNING
+        case "ERROR":
+            loglevel = logging.ERROR
+        case "CRITICAL":
+            loglevel = logging.CRITICAL
+        case _:
+            loglevel = logging.INFO
+
+    FORMAT = "%(message)s"
+    logging.basicConfig(
+        level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()]
+    )
+    logging.getLogger().setLevel(loglevel)
+
 
 def find_oksincludes(includes:list[str], extra_dirs:list[str] = []):
     includefiles = []

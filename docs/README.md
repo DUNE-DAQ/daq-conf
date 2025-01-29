@@ -18,10 +18,10 @@ Commandline utility to generate a graphical flow diagram of a full configuration
   Add Resource objects to or remove from the `disabled` relationship of a Session
 
 ### `consolidate`
-  Merge the contents of several database files, putting all objects into a single output file. Output file will only include schemas.
+  Merge the contents of several database files, putting all objects into a single output file. The output file's include list will contain the schema files included by the source databases (or their includes), but will not contain any object databases (the schema themselves).
 
 ### `consolidate_files`
-  Merge the contents of several database files, preserving included databases. Output file will contain only objects defined in files given on command line.
+  Merge the contents of several database files, preserving included databases. Output file will contain only objects defined in files given on command line. The output files' include list will contain the schema files included by the source databases (or their includes), but will not contain any object databases (the schema themselves).
 
 ### `copy_configuration`
   Copy the input file(s) to the specified directory, also moving any included files and updating include paths, to create a clone of the configuration databases.

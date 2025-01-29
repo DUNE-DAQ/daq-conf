@@ -54,8 +54,8 @@ def generate_dataflow(
         hosts.append("vlocalhost")
 
     # Services
-    dfo_control = db.get_dal(class_name="Service", uid="dfo-01_control")
-    tpw_control = db.get_dal(class_name="Service", uid="tp-stream-writer_control")
+    daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
 
     # Source IDs
     tpw_source_id = db.get_dal("SourceIDConf", uid="srcid-tp-stream-writer")
@@ -110,7 +110,7 @@ def generate_dataflow(
         "dfo-01",
         runs_on=host,
         application_name="daq_application",
-        exposes_service=[dfo_control],
+        exposes_service=[daqapp_control],
         network_rules=dfo_netrules,
         opmon_conf=opmon_conf,
         dfo=dfo_conf,
@@ -134,18 +134,11 @@ def generate_dataflow(
         )
         db.update_dal(dfapp_source_id)
 
-        dfapp_control = dal.Service(
-            f"df-{dfapp_id:02}_control",
-            protocol="rest",
-            port=0,
-        )
-        db.update_dal(dfapp_control)
-
         dfapp = dal.DFApplication(
             f"df-{dfapp_id:02}",
             runs_on=host,
             application_name="daq_application",
-            exposes_service=[dfapp_control],
+            exposes_service=[daqapp_control],
             source_id=dfapp_source_id,
             queue_rules=dfapp_qrules,
             network_rules=dfapp_netrules,
@@ -168,7 +161,7 @@ def generate_dataflow(
             "tp-stream-writer",
             runs_on=host,
             application_name="daq_application",
-            exposes_service=[tpw_control],
+            exposes_service=[daqapp_control],
             source_id=tpw_source_id,
             network_rules=tpw_netrules,
             opmon_conf=opmon_conf,
@@ -179,17 +172,13 @@ def generate_dataflow(
 
     if generate_segment:
         fsm = db.get_dal(class_name="FSMconfiguration", uid="FSMconfiguration_noAction")
-        controller_service = dal.Service(
-            "df-controller_control", protocol="grpc", port=0
-        )
-        db.update_dal(controller_service)
         controller = dal.RCApplication(
             "df-controller",
             application_name="drunc-controller",
             runs_on=host,
             fsm=fsm,
             opmon_conf=opmon_conf,
-            exposes_service=[controller_service],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
 
@@ -250,9 +239,9 @@ def generate_hsi(
         hosts.append("vlocalhost")
 
     # Services
-    hsi_control = db.get_dal(class_name="Service", uid="hsi-01_control")
+    daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
     dataRequests = db.get_dal(class_name="Service", uid="dataRequests")
-    tc_app_control = db.get_dal(class_name="Service", uid="hsi-to-tc-app_control")
     hsievents = db.get_dal(class_name="Service", uid="HSIEvents")
 
     # Source IDs
@@ -285,7 +274,7 @@ def generate_hsi(
         "hsi-01",
         runs_on=host,
         application_name="daq_application",
-        exposes_service=[hsi_control],
+        exposes_service=[daqapp_control],
         source_id=hsi_source_id,
         queue_rules=hsi_qrules,
         network_rules=hsi_netrules,
@@ -301,7 +290,7 @@ def generate_hsi(
         "hsi-to-tc-app",
         runs_on=host,
         application_name="daq_application",
-        exposes_service=[dataRequests, hsievents, tc_app_control],
+        exposes_service=[dataRequests, hsievents, daqapp_control],
         source_id=hsi_tc_source_id,
         network_rules=tc_netrules,
         opmon_conf=opmon_conf,
@@ -311,17 +300,13 @@ def generate_hsi(
 
     if generate_segment:
         fsm = db.get_dal(class_name="FSMconfiguration", uid="FSMconfiguration_noAction")
-        controller_service = dal.Service(
-            "hsi-controller_control", protocol="grpc", port=0
-        )
-        db.update_dal(controller_service)
         controller = dal.RCApplication(
             "hsi-controller",
             application_name="drunc-controller",
             runs_on=host,
             fsm=fsm,
             opmon_conf=opmon_conf,
-            exposes_service=[controller_service],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
 
@@ -347,7 +332,7 @@ def generate_readout(
   ReadoutApplications defined in a readout map.
 
     The file will automatically include the relevant schema files and
-  any other OKS files you specify. 
+  any other OKS files you specify.
 
    Example:
      generate_readoutOKS -i hosts \
@@ -440,6 +425,8 @@ def generate_readout(
     db.set_active(oksfile)
 
     detector_connections = db.get_dals(class_name="DetectorToDaqConnection")
+    daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
 
     try:
         rule = db.get_dal(
@@ -610,10 +597,6 @@ def generate_readout(
                     )
 
             datareader = nicrec
-            wiec_control = dal.Service(
-                f"wiec-{connection.id}_control", protocol="rest", port=0
-            )
-            db.update_dal(wiec_control)
 
             wiec_app = dal.WIECApplication(
                 f"wiec-{connection.id}",
@@ -622,7 +605,7 @@ def generate_readout(
                 contains=[connection],
                 wib_module_conf=wm_conf,
                 hermes_module_conf=hermes_conf,
-                exposes_service=[wiec_control],
+                exposes_service=[daqapp_control],
             )
             db.update_dal(wiec_app)
 
@@ -647,8 +630,6 @@ def generate_readout(
         timeSyncs = db.get_dal(class_name="Service", uid="timeSyncs")
         triggerActivities = db.get_dal(class_name="Service", uid="triggerActivities")
         triggerPrimitives = db.get_dal(class_name="Service", uid="triggerPrimitives")
-        ru_control = dal.Service(f"ru-{connection.id}_control", protocol="rest", port=0)
-        db.update_dal(ru_control)
 
         # Action Plans
         readout_start = db.get_dal(class_name="ActionPlan", uid="readout-start")
@@ -667,7 +648,7 @@ def generate_readout(
             tp_generation_enabled=tpg_enabled,
             ta_generation_enabled=tpg_enabled,
             uses=rohw,
-            exposes_service=[ru_control, dataRequests, timeSyncs],
+            exposes_service=[daqapp_control, dataRequests, timeSyncs],
             action_plans=[readout_start, readout_stop],
         )
         if tpg_enabled:
@@ -697,18 +678,13 @@ def generate_readout(
     if generate_segment:
         # fsm = db.get_dal(class_name="FSMconfiguration", uid="fsmConf-test")
         fsm = db.get_dal(class_name="FSMconfiguration", uid="FSMconfiguration_noAction")
-        controller_service = dal.Service(
-            "ru-controller_control", protocol="grpc", port=0
-        )
-        db.update_dal(controller_service)
-        db.commit()
         controller = dal.RCApplication(
             "ru-controller",
             application_name="drunc-controller",
             runs_on=host,
             fsm=fsm,
             opmon_conf=opmon_conf,
-            exposes_service=[controller_service],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
         db.commit()
@@ -767,6 +743,8 @@ def generate_fakedata(
     source_id = 0
     fakeapps = []
     # Services
+    daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
     dataRequests = db.get_dal(class_name="Service", uid="dataRequests")
     timeSyncs = db.get_dal(class_name="Service", uid="timeSyncs")
     opmon_conf = db.get_dal(class_name="OpMonConf", uid="slow-all-monitoring")
@@ -805,13 +783,10 @@ def generate_fakedata(
 
     for appidx in range(n_apps):
 
-        ru_control = dal.Service(f"fakedata_{appidx}_control", protocol="rest", port=0)
-        db.update_dal(ru_control)
-
         fakeapp = dal.FakeDataApplication(f"fakedata_{appidx}",
         runs_on=host,
         application_name="daq_application",
-        exposes_service=[ru_control, dataRequests, timeSyncs],
+        exposes_service=[daqapp_control, dataRequests, timeSyncs],
         queue_rules=qrules,
         network_rules=netrules,
         opmon_conf=opmon_conf,)
@@ -836,17 +811,13 @@ def generate_fakedata(
 
     if generate_segment:
         fsm = db.get_dal(class_name="FSMconfiguration", uid="FSMconfiguration_noAction")
-        controller_service = dal.Service(
-            "ru-controller_control", protocol="grpc", port=0
-        )
-        db.update_dal(controller_service)
         controller = dal.RCApplication(
             "ru-controller",
             application_name="drunc-controller",
             opmon_conf=opmon_conf,
             runs_on=host,
             fsm=fsm,
-            exposes_service=[controller_service],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
 
@@ -910,9 +881,9 @@ def generate_trigger(
         hosts.append("vlocalhost")
 
     # Services
-    mlt_control = db.get_dal(class_name="Service", uid="mlt_control")
+    daqapp_control = db.get_dal(class_name="Service", uid="daqapp_control")
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
     dataRequests = db.get_dal(class_name="Service", uid="dataRequests")
-    tc_maker_control = db.get_dal(class_name="Service", uid="tc-maker-1_control")
     triggerActivities = db.get_dal(class_name="Service", uid="triggerActivities")
     triggerCandidates = db.get_dal(class_name="Service", uid="triggerCandidates")
     triggerInhibits = db.get_dal(class_name="Service", uid="triggerInhibits")
@@ -961,7 +932,7 @@ def generate_trigger(
         "mlt",
         runs_on=host,
         application_name="daq_application",
-        exposes_service=[mlt_control, triggerCandidates, triggerInhibits, dataRequests],
+        exposes_service=[daqapp_control, triggerCandidates, triggerInhibits, dataRequests],
         source_id=mlt_source_id,
         queue_rules=mlt_qrules,
         network_rules=mlt_netrules,
@@ -981,7 +952,7 @@ def generate_trigger(
             "tc-maker-1",
             runs_on=host,
             application_name="daq_application",
-            exposes_service=[tc_maker_control, triggerActivities, dataRequests],
+            exposes_service=[daqapp_control, triggerActivities, dataRequests],
             source_id=tc_source_id,
             queue_rules=tapp_qrules,
             network_rules=tapp_netrules,
@@ -993,17 +964,13 @@ def generate_trigger(
 
     if generate_segment:
         fsm = db.get_dal(class_name="FSMconfiguration", uid="FSMconfiguration_noAction")
-        controller_service = dal.Service(
-            "trg-controller_control", protocol="grpc", port=0
-        )
-        db.update_dal(controller_service)
         controller = dal.RCApplication(
             "trg-controller",
             application_name="drunc-controller",
             opmon_conf=opmon_conf,
             runs_on=host,
             fsm=fsm,
-            exposes_service=[controller_service],
+            exposes_service=[rccontroller_control],
         )
         db.update_dal(controller)
 
@@ -1066,14 +1033,13 @@ def generate_session(
         hosts.append("vlocalhost")
 
     fsm = db.get_dal(class_name="FSMconfiguration", uid="fsmConf-test")
-    controller_service = dal.Service("root-controller_control", protocol="grpc", port=0)
-    db.update_dal(controller_service)
+    rccontroller_control = db.get_dal(class_name="Service", uid="rccontroller_control")
     controller = dal.RCApplication(
         "root-controller",
         application_name="drunc-controller",
         runs_on=host,
         fsm=fsm,
-        exposes_service=[controller_service],
+        exposes_service=[rccontroller_control],
     )
     db.update_dal(controller)
 
